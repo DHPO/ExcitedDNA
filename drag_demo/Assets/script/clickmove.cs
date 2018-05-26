@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;  
    
-public class clickmove : MonoBehaviour {  
+public class clickmove : MonoBehaviour {
+    private bool draging = false;  
    
     // Use this for initialization  
     void Start () {  
@@ -35,9 +36,12 @@ public class clickmove : MonoBehaviour {
             //CurPosition就是物体应该的移动向量赋给transform的position属性        
             transform.position = CurPosition;  
             //这个很主要  
+            this.draging = true;
             yield return new WaitForFixedUpdate();  
         }  
            
-           
+        this.draging = false;
     }  
+
+    public bool isDraging() {return this.draging;}
 }

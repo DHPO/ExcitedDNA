@@ -14,7 +14,10 @@ public class slot : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+		if (this.parent.gameObject.GetComponent<clickmove>().isDraging() && this.attach) {
+			this.attach.gameObject.transform.position = this.transform.position;
+			this.attach.gameObject.transform.rotation = this.transform.rotation;
+		}
 	}
 
 	void OnTriggerEnter(Collider other) {

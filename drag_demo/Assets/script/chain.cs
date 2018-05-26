@@ -24,7 +24,7 @@ public class chain : MonoBehaviour {
 			return false;
 		GameObject slot = Instantiate(slotPrefab) as GameObject;
 		slot.transform.parent = this.transform;
-		slot.transform.position += this.transform.rotation * Vector3.down * 1.0F * index;
+		slot.transform.position = this.transform.position + this.transform.rotation * Vector3.down * 1.5F * index;
 		slot.transform.rotation = this.transform.rotation;
 		slot.GetComponent<slot>().index = index;
 		slot.GetComponent<slot>().parent = this;
