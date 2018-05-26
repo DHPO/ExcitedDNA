@@ -5,7 +5,11 @@ licenseType: Free
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - slotPrefab: {fileID: 1901473878643258, guid: 317b32930f3284062b3c6661d08f8041,
+      type: 2}
+  - chainBuilder: {fileID: 1188284853470374, guid: 5813989e878f54c938a4758614597bd9,
+      type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

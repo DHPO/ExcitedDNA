@@ -31,6 +31,12 @@ public class slot : MonoBehaviour {
 			this.attach.attach();
 			this.parent.attach(this);
 		}
+		if (other.gameObject.tag == "slot") {
+			slot otherSlot = other.gameObject.GetComponent<slot>();
+			if (parent.isLast(index) && otherSlot.parent.isFirst(otherSlot.index)) {
+				parent.chainBuilder.GetComponent<chainBuilder>().joinChains(parent, otherSlot.parent);
+			}
+		}
 	}
 
 	void OnTriggerExit(Collider other) {
@@ -61,5 +67,12 @@ public class slot : MonoBehaviour {
 			this.attach = (Instantiate(nucleotidePrefab, this.transform.position, this.transform.rotation) as GameObject).GetComponent<Nucleotide>();
 		this.attach.attach();
 		this.attach.setType(t);
+	}
+
+	public void destroy() {
+		if (this.attach) {
+			Destroy(this.attach.gameObject);
+		}
+		Destroy(this.gameObject);
 	}
 }

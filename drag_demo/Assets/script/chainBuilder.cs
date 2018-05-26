@@ -16,12 +16,20 @@ public class chainBuilder : MonoBehaviour {
 		
 	}
 
-	public void buildChain(string sequence) {
-		GameObject c = Instantiate(chainPrefab) as GameObject;
+	public void buildChain(string sequence, Transform t=null) {
+		if (t == null)
+			t = this.transform;
+		GameObject c = Instantiate(chainPrefab, t.position, t.rotation) as GameObject;
 		c.GetComponent<chain>().setSequence(sequence);
 	}
 
 	public void buildFromCache() {
 		buildChain(chainCache);
+	}
+
+	public void joinChains(chain c1, chain c2) {
+		buildChain(c1.getSequence() + c2.getSequence(), c1.gameObject.transform);
+		c1.destroy();
+		c2.destroy();
 	}
 }

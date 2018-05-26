@@ -69,6 +69,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   slotPrefab: {fileID: 1901473878643258, guid: 317b32930f3284062b3c6661d08f8041, type: 2}
+  chainBuilder: {fileID: 1174526828736086, guid: 453e8d51814eb47ae83f5a78a68337b7,
+    type: 2}
 --- !u!114 &114428935786256000
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class chain : MonoBehaviour {
 	public GameObject slotPrefab;
+	public GameObject chainBuilder;
 	public Hashtable slots;
 	private int maxIdx = 0;
 	private int minIdx = 0;
@@ -132,5 +133,20 @@ public class chain : MonoBehaviour {
 		}
 		Debug.Log(result);
 		return result;
+	}
+
+	public bool isFirst(int idx) {
+		return idx == minIdx;
+	}
+
+	public bool isLast(int idx) {
+		return idx == maxIdx;
+	}
+
+	public void destroy() {
+		foreach(slot s in slots.Values) {
+			s.destroy();
+		}
+		Destroy(this.gameObject);
 	}
 }
