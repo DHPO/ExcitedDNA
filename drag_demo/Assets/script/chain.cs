@@ -10,13 +10,39 @@ public class chain : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		slots = new Hashtable();
+		if (slots == null)
+			slots = new Hashtable();
 		addSlot(0);
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		
+	}
+
+	public void setSequence(string sequence) {
+		foreach (char c in sequence) {
+			Nucleotide.Type t = Nucleotide.Type.Unknown;
+			switch (c) {
+				case 'A':
+					t = Nucleotide.Type.A;
+					break;
+				case 'T':
+					t = Nucleotide.Type.T;
+					break;
+				case 'C':
+					t = Nucleotide.Type.C;
+					break;
+				case 'G':
+					t = Nucleotide.Type.G;
+					break;
+				case '-':
+					t = Nucleotide.Type.Unknown;
+					break;
+			}
+			appendFilledSlot(t);
+			// Debug.Log(c);
+		}
 	}
 
 	private bool addSlot(int index) {
@@ -29,6 +55,17 @@ public class chain : MonoBehaviour {
 		slot.GetComponent<slot>().index = index;
 		slot.GetComponent<slot>().parent = this;
 		slots.Add(index, slot.GetComponent<slot>());
+		return true;
+	}
+
+	private bool appendFilledSlot(Nucleotide.Type t) {
+		if (slots == null)
+			slots = new Hashtable();
+		if (!slots.Contains(0))
+			addSlot(0);
+		if (t != Nucleotide.Type.Unknown)
+			(slots[maxIdx] as slot).setType(t);
+		attach(slots[maxIdx] as slot);
 		return true;
 	}
 
@@ -52,6 +89,8 @@ public class chain : MonoBehaviour {
 	}
 
 	public bool detach(slot s) {
+		if (slots == null)
+			slots = new Hashtable();
 		if (!slots.Contains(s.index))
 			return false;
 		int index = s.index;
@@ -64,5 +103,34 @@ public class chain : MonoBehaviour {
 			this.minIdx = index;
 		}
 		return true;
+	}
+
+	public string getSequence() {
+		string result = "";
+		for (int i = minIdx + 1; i < maxIdx; i++) {
+				switch ((slots[i] as slot).getType())
+				{
+					case Nucleotide.Type.A:
+						result += "A";
+						break;
+					case Nucleotide.Type.T:
+						result += "T";
+						break;
+					case Nucleotide.Type.C:
+						result += "C";
+						break;
+					case Nucleotide.Type.G:
+						result += "G";
+						break;
+					case Nucleotide.Type.Unknown:
+						result += "-";
+						break;
+					default:
+						result += "?";
+						break;
+				}
+		}
+		Debug.Log(result);
+		return result;
 	}
 }

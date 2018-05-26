@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 33625788992570038}
   - component: {fileID: 65804626608446662}
   - component: {fileID: 23949873693406034}
-  - component: {fileID: 114808844304407932}
+  - component: {fileID: 114826970526081852}
   m_Layer: 0
   m_Name: slot
   m_TagString: slot
@@ -96,7 +96,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 3, y: 3, z: 3}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &114808844304407932
+--- !u!114 &114826970526081852
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -109,3 +109,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   index: 0
   parent: {fileID: 0}
+  nucleotidePrefab: {fileID: 1909434698508854, guid: 95fb5df61ec9949f5a4d44177858fd62,
+    type: 2}

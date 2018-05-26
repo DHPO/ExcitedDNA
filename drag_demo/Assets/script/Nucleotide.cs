@@ -12,8 +12,9 @@ public class Nucleotide : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		this.type = Type.A;
-		bonds.SetActive(false);
+		//this.type = Type.A;
+		if (count == 0)
+			bonds.SetActive(false);
 	}
 	
 	// Update is called once per frame
@@ -32,6 +33,10 @@ public class Nucleotide : MonoBehaviour {
 			bonds.SetActive(false);
 	}
 
+	public bool isAttached() {
+		return count > 0;
+	}
+
 	private void setColor(Color c) {
 		this.base_.GetComponent<Renderer>().material.color = c;
 	}
@@ -41,6 +46,7 @@ public class Nucleotide : MonoBehaviour {
 	}
 
 	public void setType(Type t) {
+		this.type = t;
 		switch (t)
 		{
 			case Type.A:
