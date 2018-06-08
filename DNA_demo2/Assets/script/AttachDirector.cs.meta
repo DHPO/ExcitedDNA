@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b60ea5e107b804bd8b1f6bbb1537c15c
+timeCreated: 1528437147
+licenseType: Free
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - detachTrigger: {fileID: 1099003679976116, guid: 901921418898f488dac69dff690d991d,
+      type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
