@@ -33,7 +33,7 @@ GameObject:
   m_IsActive: 1
 --- !u!1 &1126680353060838
 GameObject:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 5
@@ -87,6 +87,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1559197756918862
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4467602252995498}
+  m_Layer: 0
+  m_Name: prevBond
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1682916861072502
 GameObject:
   m_ObjectHideFlags: 0
@@ -106,9 +121,24 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!1 &1889118994048280
+--- !u!1 &1782595792602476
 GameObject:
   m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4291728253970994}
+  m_Layer: 0
+  m_Name: nextBond
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &1889118994048280
+GameObject:
+  m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 5
@@ -153,7 +183,7 @@ Transform:
   m_Children:
   - {fileID: 4513041607534876}
   m_Father: {fileID: 4825770515393836}
-  m_RootOrder: 4
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4123425213771442
 Transform:
@@ -165,8 +195,8 @@ Transform:
   m_LocalPosition: {x: 0, y: -0.7, z: 0}
   m_LocalScale: {x: 0.14999999, y: 0.29999998, z: 0.14999999}
   m_Children: []
-  m_Father: {fileID: 4825770515393836}
-  m_RootOrder: 2
+  m_Father: {fileID: 4291728253970994}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4194508176602370
 Transform:
@@ -179,7 +209,7 @@ Transform:
   m_LocalScale: {x: 0.14999999, y: 0.29999998, z: 0.14999999}
   m_Children: []
   m_Father: {fileID: 4825770515393836}
-  m_RootOrder: 3
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
 --- !u!4 &4216694798612708
 Transform:
@@ -191,8 +221,36 @@ Transform:
   m_LocalPosition: {x: 0, y: 0.7, z: 0}
   m_LocalScale: {x: 0.15, y: 0.3, z: 0.15}
   m_Children: []
+  m_Father: {fileID: 4467602252995498}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4291728253970994
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1782595792602476}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1.2, z: 1}
+  m_Children:
+  - {fileID: 4123425213771442}
   m_Father: {fileID: 4825770515393836}
-  m_RootOrder: 1
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4467602252995498
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1559197756918862}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1.2, z: 1}
+  m_Children:
+  - {fileID: 4216694798612708}
+  m_Father: {fileID: 4825770515393836}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4513041607534876
 Transform:
@@ -214,14 +272,14 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1017232182078238}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4876489356504896}
-  - {fileID: 4216694798612708}
-  - {fileID: 4123425213771442}
   - {fileID: 4194508176602370}
   - {fileID: 4043807403849648}
+  - {fileID: 4467602252995498}
+  - {fileID: 4291728253970994}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -593,11 +651,12 @@ MonoBehaviour:
   next: {fileID: 0}
   headTrigger: {fileID: 114642049441720956}
   tailTrigger: {fileID: 0}
-  prevBond: {fileID: 1889118994048280}
-  nextBond: {fileID: 1126680353060838}
+  prevBond: {fileID: 1559197756918862}
+  nextBond: {fileID: 1782595792602476}
   base_: {fileID: 114301275270460914}
   broadcast: 0
   type: 0
+  isPaired: 0
 --- !u!114 &114301275270460914
 MonoBehaviour:
   m_ObjectHideFlags: 1

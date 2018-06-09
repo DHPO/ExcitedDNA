@@ -5,65 +5,107 @@ using UnityEngine;
 public class NucleotideCouple : MonoBehaviour
 {
 
-    public NucleotideCouple last;
+    public NucleotideCouple prev;
     public NucleotideCouple next;
-    public float force;
-    public bool needHelix;
+    public float force = 1F;
+    public bool needHelix = true;
+    public float gap = 1.5F;
+    public Nucleotide nucleotide1;
+    public Nucleotide nucleotide2;
 
     private float angle = 36;
-    private bool hasLast, hasNext;
+    private bool hasPrev, hasNext;
     private float angularX;
 
 
     // Use this for initialization
     void Start()
     {
-        hasLast = (last != null);
+        hasPrev = (prev != null);
         hasNext = (next != null);
         angularX = 0;
+
+        
     }
 
     // Update is called once per frame
     void Update()
     {
+
+        nucleotide1.enableDrag(false);
+        nucleotide2.enableDrag(false);
+
+        /* test */
+        nucleotide1.prevBond.SetActive(prev!=null);
+        nucleotide2.prevBond.SetActive(prev!=null);
+        nucleotide2.nextBond.SetActive(next!=null);
+        nucleotide1.nextBond.SetActive(next!=null);
+        nucleotide1.isPaired = true;
+        nucleotide2.isPaired = true;
+
         transform.Rotate(new Vector3(0, angularX));
+        
         angularX = 0;
+        float helixRatio = 0; /* 0: no helix; 1: totally helix */
+
         if (needHelix)
         {
-            if (hasLast)
+            if (hasPrev)
             {
-                float y = last.transform.localEulerAngles.y;
+                float y = prev.transform.localEulerAngles.y;
                 y += angle;
                 angularX += calcuForce(y) * force * Time.deltaTime;
+                helixRatio = 1 - Mathf.Abs(transform.localEulerAngles.y % 360 - y % 360) % angle / angle;
             }
             if (hasNext)
             {
                 float y = next.transform.localEulerAngles.y;
                 y -= angle;
                 angularX += calcuForce(y) * force * Time.deltaTime;
+                helixRatio = 1 - Mathf.Abs(transform.localEulerAngles.y % 360 - y % 360) % angle / angle;
             }
         }
         else
         {
-            if (hasLast && !last.isHelix())
+            if (hasPrev && !prev.isHelix())
             {
-                float y = last.transform.localEulerAngles.y;
+                float y = prev.transform.localEulerAngles.y;
                 angularX += calcuForce(y) * force * Time.deltaTime;
+                helixRatio = 1 - Mathf.Abs(transform.localEulerAngles.y % 360 - y % 360) % angle / angle;
             }
             else if (hasNext && !next.isHelix())
             {
                 float y = next.transform.localEulerAngles.y;
                 angularX += calcuForce(y) * force * Time.deltaTime;
+                helixRatio = 1 - Mathf.Abs(transform.localEulerAngles.y % 360 - y % 360) % angle / angle;
             }
         }
+
+        //nucleotide1.transform.eulerAngles = new Vector3(-45, transform.localEulerAngles.y, 0);
+        nucleotide1.prevBond.transform.eulerAngles = new Vector3(-45 * helixRatio, transform.localEulerAngles.y, -9 * helixRatio);
+        nucleotide1.nextBond.transform.eulerAngles = new Vector3(-45 * helixRatio, transform.localEulerAngles.y,  9 * helixRatio);
+        //nucleotide2.transform.eulerAngles = new Vector3(45, transform.localEulerAngles.y, 180);
+        nucleotide2.prevBond.transform.eulerAngles = new Vector3( 45 * helixRatio, transform.localEulerAngles.y,  9 * helixRatio);
+        nucleotide2.nextBond.transform.eulerAngles = new Vector3( 45 * helixRatio, transform.localEulerAngles.y, -9 * helixRatio);
     }
+
+    void FixedUpdate () {
+		try{
+			if (gameObject.GetComponent<clickmove>().isDraging())
+				broadcastUpdateTransform();
+		}
+		catch(System.Exception) {}
+
+		/*if (broadcast)
+			broadcastUpdateTransform();*/
+	}
 
     float calcuForce(float y)
     {
         float me = transform.localEulerAngles.y % 360;
         float des = y % 360;
         float force = des - me;
-        Debug.Log(force);
+        //Debug.Log(force);
 
         if (Mathf.Abs(force) < 1)
         {
@@ -87,4 +129,38 @@ public class NucleotideCouple : MonoBehaviour
     {
         return needHelix;
     }
+
+    public void setType(Nucleotide.Type t1, Nucleotide.Type t2) {
+        nucleotide1.setType(t1);
+        nucleotide2.setType(t2);
+    }
+
+    public void updateTransform(Vector3 position, Quaternion rotation, NucleotideCouple from) {
+		this.transform.position = position;
+		//this.transform.rotation = rotation;
+
+		if (prev && from != prev) {
+			Quaternion prevRotation = rotation;
+			Vector3 prevPosition = position + rotation * Vector3.up * gap;
+			prev.updateTransform(prevPosition, prevRotation, this);
+		}
+		if (next && from != next) {
+			Quaternion nextRotation = rotation;
+			Vector3 nextPosition = position + rotation * Vector3.down * gap;
+			next.updateTransform(nextPosition, nextRotation, this);
+		}
+	}
+
+	public void broadcastUpdateTransform() {
+		if (prev) {
+			Quaternion prevRotation = this.transform.rotation;
+			Vector3 prevPosition = this.transform.position + this.transform.rotation * Vector3.up * gap;
+			prev.updateTransform(prevPosition, prevRotation, this);
+		}
+		if (next) {
+			Quaternion nextRotation = this.transform.rotation;
+			Vector3 nextPosition = this.transform.position + this.transform.rotation * Vector3.down * gap;
+			next.updateTransform(nextPosition, nextRotation, this);
+		}
+	}
 }

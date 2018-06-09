@@ -20,7 +20,7 @@ public class EndpointTrigger : MonoBehaviour {
 	private void OnTriggerEnter(Collider other) {
 		if (other.tag == "Nucleotide") {
 			Nucleotide n = other.gameObject.GetComponent<Nucleotide>();
-			if (isHead && !attached) {
+			if (isHead && !attached && !n.isPaired && !parent.isPaired) {
 				if (parent.addPrev(n))
 					attached = true;
 			}

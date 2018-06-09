@@ -20,6 +20,8 @@ public class Nucleotide : MonoBehaviour {
 	public enum Type{Empty, A, T, C, G};
 	public Type type;
 
+	public bool isPaired = false;
+
 	// Use this for initialization
 	void Start () {
 		if (headTrigger) {
@@ -99,5 +101,32 @@ public class Nucleotide : MonoBehaviour {
 	public void setType(Type t) {
 		this.type = t;
 		base_.setType(t);
+		if (t == Type.Empty) {
+			enableDisplay(false);
+		}
+		else {
+			enableDisplay(true);
+		}
+	}
+
+	private void enableDisplay(bool isEnabled) {
+		MeshRenderer render = gameObject.GetComponentInChildren<MeshRenderer>();
+		if (isEnabled) {
+			foreach ( Transform child in transform ) {
+				child.gameObject.SetActive( true );
+			}
+			render.enabled = true;
+		}
+		else {
+			foreach ( Transform child in transform ) {
+				child.gameObject.SetActive( false );
+			}
+			render.enabled = false;
+		}
+	}
+
+	public void enableDrag(bool isEnabled) {
+		clickmove c = gameObject.GetComponent<clickmove>();
+		c.enabled = isEnabled;
 	}
 }

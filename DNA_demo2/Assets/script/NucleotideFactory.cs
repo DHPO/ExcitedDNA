@@ -18,8 +18,8 @@ public class NucleotideFactory : MonoBehaviour {
 	}*/
 
 	void OnTriggerExit(Collider other) {
-		Debug.Log("found exit");
-		Debug.Log(other.tag);
+		//Debug.Log("found exit");
+		//Debug.Log(other.tag);
 		if (other.tag == "Nucleotide") {
 			buildNucleotide();
 		}
