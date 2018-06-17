@@ -7,5 +7,6 @@ public class single2couple : MonoBehaviour {
 		if (other.tag == "Nucleotide") {
 			NucleotideDirector.getInstance().buildCoupleChainFromOneSingle(other.gameObject.GetComponent<Nucleotide>());
 		}
+        
 	}
 }

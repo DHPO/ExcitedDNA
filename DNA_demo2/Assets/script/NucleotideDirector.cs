@@ -20,10 +20,22 @@ public class NucleotideDirector : MonoBehaviour {
 		GameObject couple = Instantiate(couplePrefab) as GameObject;
 		couple.transform.position = n.transform.position;
 		couple.transform.rotation = n.transform.rotation;
+        
 		couple.gameObject.GetComponent<NucleotideCouple>().setType(n.type, getPairType(n.type));
-		Destroy(n.gameObject);
+        couple.gameObject.GetComponent<NucleotideCouple>().tag= "NucleotideCouple";
+        
+        Destroy(n.gameObject);
 		return couple.gameObject.GetComponent<NucleotideCouple>();
 	}
+
+    //核苷酸之间氢键角度不知道怎么归位，deHelix先注释掉了
+    //public void deHelix(NucleotideCouple n)
+    //{
+    //    if(n.needHelix == true)
+    //    {
+    //        n.needHelix = false;
+    //    }
+    //}
 
 	public void buildCoupleChainFromOneSingle(Nucleotide n) {
 		if (n.isPaired)
@@ -42,10 +54,12 @@ public class NucleotideDirector : MonoBehaviour {
 				next = next.next;
 				couple.next = buildCoupleFromOneSingle(next.prev);
 				couple.next.prev = couple;
-				couple = couple.next;
+                
+                couple = couple.next;
 			}
 			couple.next = buildCoupleFromOneSingle(next);
-			couple.next.prev = couple;
+           
+            couple.next.prev = couple;
 			coupleHead.broadcastUpdateTransform();
 		}
 	}
@@ -74,4 +88,21 @@ public class NucleotideDirector : MonoBehaviour {
 				return Nucleotide.Type.Empty;
 		}
 	}
+
+    public Nucleotide.Type Char2Type(char t)
+    {
+        switch (t)
+        {
+            case 'A':
+                return Nucleotide.Type.A;
+            case 'G':
+                return Nucleotide.Type.G;
+            case 'T':
+                return Nucleotide.Type.T;
+            case 'C':
+                return Nucleotide.Type.C;
+            default:
+                return Nucleotide.Type.Empty;
+        }
+    }
 }

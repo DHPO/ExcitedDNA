@@ -128,6 +128,7 @@ public class NucleotideCouple : MonoBehaviour
     public bool isHelix()
     {
         return needHelix;
+
     }
 
     public void setType(Nucleotide.Type t1, Nucleotide.Type t2) {
