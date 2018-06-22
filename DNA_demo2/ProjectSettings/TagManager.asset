@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Nucleotide
   - cut
+  - NucleotideCouple
   layers:
   - Default
   - TransparentFX

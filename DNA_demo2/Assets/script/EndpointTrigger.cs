@@ -30,7 +30,7 @@ public class EndpointTrigger : MonoBehaviour {
 		else if (other.tag == "cut") {//判断parent上下的核苷酸类型再cutPrev
 			if (attached) {
                 Cutter cutter = GameObject.Find("Knife").GetComponent<Cutter>();
-                NucleotideDirector n = GameObject.Find("NucleotideDirector").GetComponent<NucleotideDirector>();
+                NucleotideDirector n = NucleotideDirector.getInstance();//GameObject.Find("NucleotideDirector").GetComponent<NucleotideDirector>();
                 Nucleotide tmp = parent;
                 string before = cutter.seqBeforeCutPoint;
                 string after = cutter.seqAfterCutPoint;

@@ -50,43 +50,55 @@ public class NucleotideCouple : MonoBehaviour
 
         if (needHelix)
         {
+            float helixRatioPrev = 0;
+            float helixRatioNext = 0;
             if (hasPrev)
             {
                 float y = prev.transform.localEulerAngles.y;
                 y += angle;
                 angularX += calcuForce(y) * force * Time.deltaTime;
-                helixRatio = 1 - Mathf.Abs(transform.localEulerAngles.y % 360 - y % 360) % angle / angle;
+                helixRatioPrev = 1 - Mathf.Abs(transform.localEulerAngles.y % 360 - y % 360) % angle / angle;
             }
             if (hasNext)
             {
                 float y = next.transform.localEulerAngles.y;
                 y -= angle;
                 angularX += calcuForce(y) * force * Time.deltaTime;
-                helixRatio = 1 - Mathf.Abs(transform.localEulerAngles.y % 360 - y % 360) % angle / angle;
+                helixRatioNext = 1 - Mathf.Abs(transform.localEulerAngles.y % 360 - y % 360) % angle / angle;
             }
+            helixRatio = Mathf.Max(helixRatioPrev, helixRatioNext);
         }
         else
         {
+            float helixRatioPrev = 0;
+            float helixRatioNext = 0;
             if (hasPrev && !prev.isHelix())
             {
                 float y = prev.transform.localEulerAngles.y;
                 angularX += calcuForce(y) * force * Time.deltaTime;
-                helixRatio = 1 - Mathf.Abs(transform.localEulerAngles.y % 360 - y % 360) % angle / angle;
+                helixRatioPrev = 1 - Mathf.Abs(transform.localEulerAngles.y % 360 - y % 360) % angle / angle;
             }
             else if (hasNext && !next.isHelix())
             {
                 float y = next.transform.localEulerAngles.y;
                 angularX += calcuForce(y) * force * Time.deltaTime;
-                helixRatio = 1 - Mathf.Abs(transform.localEulerAngles.y % 360 - y % 360) % angle / angle;
+                helixRatioNext = 1 - Mathf.Abs(transform.localEulerAngles.y % 360 - y % 360) % angle / angle;
             }
+            helixRatio = Mathf.Max(helixRatioPrev, helixRatioNext);
         }
 
+        setBondAngle(helixRatio);
+    }
+
+    void setBondAngle(float helixRatio) {
+        float helixRatioPrev = needHelix || (prev && prev.needHelix) ? helixRatio : 0;
+        float helixRatioNext = needHelix || (next && next.needHelix) ? helixRatio : 0;
         //nucleotide1.transform.eulerAngles = new Vector3(-45, transform.localEulerAngles.y, 0);
-        nucleotide1.prevBond.transform.eulerAngles = new Vector3(-45 * helixRatio, transform.localEulerAngles.y, -9 * helixRatio);
-        nucleotide1.nextBond.transform.eulerAngles = new Vector3(-45 * helixRatio, transform.localEulerAngles.y,  9 * helixRatio);
+        nucleotide1.prevBond.transform.eulerAngles = new Vector3(-45 * helixRatioPrev, transform.localEulerAngles.y, -9 * helixRatioPrev);
+        nucleotide1.nextBond.transform.eulerAngles = new Vector3(-45 * helixRatioNext, transform.localEulerAngles.y,  9 * helixRatioNext);
         //nucleotide2.transform.eulerAngles = new Vector3(45, transform.localEulerAngles.y, 180);
-        nucleotide2.prevBond.transform.eulerAngles = new Vector3( 45 * helixRatio, transform.localEulerAngles.y,  9 * helixRatio);
-        nucleotide2.nextBond.transform.eulerAngles = new Vector3( 45 * helixRatio, transform.localEulerAngles.y, -9 * helixRatio);
+        nucleotide2.prevBond.transform.eulerAngles = new Vector3( 45 * helixRatioPrev, transform.localEulerAngles.y,  9 * helixRatioPrev);
+        nucleotide2.nextBond.transform.eulerAngles = new Vector3( 45 * helixRatioNext, transform.localEulerAngles.y, -9 * helixRatioNext);
     }
 
     void FixedUpdate () {
