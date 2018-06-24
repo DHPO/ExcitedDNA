@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using VRTK;
 
 public class Nucleotide : MonoBehaviour {
 	public Nucleotide prev = null;
@@ -68,7 +69,7 @@ public class Nucleotide : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
 		try{
-			if (gameObject.GetComponent<clickmove>().isDraging())
+			if (gameObject.GetComponent<clickmove>().isDraging() || gameObject.GetComponent<VRTK_InteractableObject>().IsGrabbed())
 				broadcastUpdateTransform();
 		}
 		catch(System.Exception) {}

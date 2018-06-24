@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using VRTK;
 
 public class NucleotideCouple : MonoBehaviour
 {
@@ -103,7 +104,7 @@ public class NucleotideCouple : MonoBehaviour
 
     void FixedUpdate () {
 		try{
-			if (gameObject.GetComponent<clickmove>().isDraging())
+			if (gameObject.GetComponent<clickmove>().isDraging() || gameObject.GetComponent<VRTK_InteractableObject>().IsGrabbed())
 				broadcastUpdateTransform();
 		}
 		catch(System.Exception) {}
