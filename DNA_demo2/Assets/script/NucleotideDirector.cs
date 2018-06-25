@@ -86,6 +86,38 @@ public class NucleotideDirector : MonoBehaviour {
 		}
 	}
 
+	public NucleotideCouple buildCoupleChainFromTwoSingles(Nucleotide c1, Nucleotide c2, Vector3 position = default(Vector3)) {
+		if (getLengthOfSingleChain(c1) != getLengthOfSingleChain(c2))
+			return null;
+
+		c1 = getHeadOfSingleChain(c1);
+		if (c1 == getHeadOfSingleChain(c2))
+			return null;
+
+		c2 = getTailOfSingleChain(c2);
+
+		NucleotideCouple n = (Instantiate(couplePrefab) as GameObject).GetComponent<NucleotideCouple>();
+		NucleotideCouple head = n;
+		n.setLeftColor(c1.getColor()); 
+		n.setRightColor(c2.getColor());
+		n.setType(c1.type, c2.type);
+		while (c1.next) {
+			c1 = c1.next;
+			c2 = c2.prev;
+			n.next = (Instantiate(couplePrefab) as GameObject).GetComponent<NucleotideCouple>();
+			n.next.setLeftColor(c1.getColor()); 
+			n.next.setRightColor(c2.getColor());
+			n.next.setType(c1.type, c2.type);
+			n.next.prev = n;
+			n = n.next;
+		}
+		head.transform.position = position;
+		head.broadcastUpdateTransform();
+		destroySingleChain(c1);
+		destroySingleChain(c2);
+		return n;
+	}
+
 	public void markCoupleChain( NucleotideCouple chain, Color c) {
 		NucleotideCouple n = getHeadOfCoupleChain(chain);
 
@@ -111,6 +143,25 @@ public class NucleotideDirector : MonoBehaviour {
 			head = head.prev;
 
 		return head;
+	}
+
+	public Nucleotide getTailOfSingleChain(Nucleotide n) {
+		Nucleotide tail = n;
+
+		while (tail.next)
+			tail = tail.next;
+
+		return tail;
+	}
+
+	public int getLengthOfSingleChain(Nucleotide n) {
+		Nucleotide head = getHeadOfSingleChain(n);
+		int cnt = 1;
+		while (n.next) {
+			cnt += 1;
+			n = n.next;
+		}
+		return cnt;
 	}
 
 	public NucleotideCouple getHeadOfCoupleChain(NucleotideCouple n) {
@@ -205,6 +256,16 @@ public class NucleotideDirector : MonoBehaviour {
 
 	public void destroyCoupleChain (NucleotideCouple chain) {
 		NucleotideCouple prev, head = getHeadOfCoupleChain(chain);
+		while (head) {
+			prev = head;
+			head = head.next;
+			Destroy(prev.gameObject);
+		}
+		Debug.Log("Destroyed");
+	}
+
+	public void destroySingleChain (Nucleotide chain) {
+		Nucleotide prev, head = getHeadOfSingleChain(chain);
 		while (head) {
 			prev = head;
 			head = head.next;

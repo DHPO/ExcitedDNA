@@ -155,6 +155,13 @@ public class NucleotideCouple : MonoBehaviour
             //Debug.Log("A/T has two bond");
             HydrogenBond2.SetActive(false);
         }
+        if (NucleotideDirector.getInstance().getPairType(t1) != t2 && t1 != Nucleotide.Type.Empty && t2 != Nucleotide.Type.Empty) {
+            nucleotide1.gameObject.GetComponent<Renderer>().material.color = Color.red;
+            nucleotide2.gameObject.GetComponent<Renderer>().material.color = Color.red;
+            HydrogenBond1.SetActive(false);
+            HydrogenBond2.SetActive(false);
+            HydrogenBond3.SetActive(false);
+        }
     }
 
     public void hideHydrogenBond()
