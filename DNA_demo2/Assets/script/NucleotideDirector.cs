@@ -50,7 +50,7 @@ public class NucleotideDirector : MonoBehaviour {
 			buildCoupleFromOneSingle(head);
 		}
 		else {
-			NucleotideCouple coupleHead = buildCoupleFromOneSingle(n);
+			NucleotideCouple coupleHead = buildCoupleFromOneSingle(head);
 			NucleotideCouple couple = coupleHead;
 
 			while(next.next) {
