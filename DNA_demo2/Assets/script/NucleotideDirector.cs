@@ -221,6 +221,62 @@ public class NucleotideDirector : MonoBehaviour {
 		}
 	}
 
+	public string CoupleChain2String(NucleotideCouple chain) {
+		NucleotideCouple n = getHeadOfCoupleChain(chain);
+		string result = "2";
+		while (n) {
+			result += Type2Char(n.getLeftType()) + Type2Char(n.getRightType());
+			n = n.next;
+		}
+		return result;
+	}
+
+	public string SingleChain2String(Nucleotide chain) {
+		Nucleotide n = getHeadOfSingleChain(chain);
+		string result = "1";
+		while (n) {
+			result += Type2Char(n.type);
+			n = n.next;
+		}
+		return result;
+	}
+
+	public Nucleotide String2SingleChain(string s, Vector3 position = default(Vector3)) {
+		if (s[0] != '1')
+			return null;
+
+		Nucleotide n = (Instantiate(singlePrefab) as GameObject).GetComponent<Nucleotide>();
+		Nucleotide head = n;
+		n.setType(Char2Type(s[1]));
+		for (int i = 2; i < s.Length; i++) {
+			n.next = (Instantiate(singlePrefab) as GameObject).GetComponent<Nucleotide>();
+			n.next.setType(Char2Type(s[i]));
+			n.next.prev = n;
+			n = n.next;
+		}
+		head.transform.position = position;
+		head.broadcastUpdateTransform();
+		return head;
+	}
+
+	public NucleotideCouple String2CoupleChain(string s, Vector3 position = default(Vector3)) {
+		if (s[0] != '2')
+			return null;
+
+		NucleotideCouple n = (Instantiate(couplePrefab) as GameObject).GetComponent<NucleotideCouple>();
+		NucleotideCouple head = n;
+		n.setType(Char2Type(s[1]), Char2Type(s[2]));
+		for (int i = 3; i < s.Length; i+= 2) {
+			n.next = (Instantiate(couplePrefab) as GameObject).GetComponent<NucleotideCouple>();
+			n.next.setType(Char2Type(s[i]), Char2Type(s[i+1]));
+			n.next.prev = n;
+			n = n.next;
+		}
+		head.transform.position = position;
+		head.broadcastUpdateTransform();
+		return n;
+	}
+
 	public Nucleotide.Type getPairType(Nucleotide.Type t) {
 		switch (t)
 		{
@@ -252,5 +308,20 @@ public class NucleotideDirector : MonoBehaviour {
             default:
                 return Nucleotide.Type.Empty;
         }
+    }
+
+    public char Type2Char(Nucleotide.Type t) {
+    	switch (t) {
+    		case Nucleotide.Type.A:
+    			return 'A';
+    		case Nucleotide.Type.T:
+    			return 'T';
+    		case Nucleotide.Type.C:
+    			return 'C';
+    		case Nucleotide.Type.G:
+    			return 'G';
+    		default:
+    			return '-';
+    	}
     }
 }
