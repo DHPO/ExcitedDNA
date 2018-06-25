@@ -18,6 +18,8 @@ public class Nucleotide : MonoBehaviour {
 
 	public static float gap = 1.5F;
 
+	private Color color;
+
 	public enum Type{Empty, A, T, C, G};
 	public Type type;
 
@@ -35,6 +37,7 @@ public class Nucleotide : MonoBehaviour {
 		}
 		prevBond.SetActive(false);
 		nextBond.SetActive(false);
+		setColor(new Color(1, 1, 1, 0));
 	}
 	
 	public void updateTransform(Vector3 position, Quaternion rotation, Nucleotide from) {
@@ -129,5 +132,14 @@ public class Nucleotide : MonoBehaviour {
 	public void enableDrag(bool isEnabled) {
 		clickmove c = gameObject.GetComponent<clickmove>();
 		c.enabled = isEnabled;
+	}
+
+	public void setColor(Color c) {
+		this.color = c;
+		gameObject.GetComponent<Renderer> ().material.color = c;
+	}
+
+	public Color getColor() {
+		return this.color;
 	}
 }
