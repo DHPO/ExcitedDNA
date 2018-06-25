@@ -37,7 +37,6 @@ public class Nucleotide : MonoBehaviour {
 		}
 		prevBond.SetActive(false);
 		nextBond.SetActive(false);
-		setColor(new Color(1, 1, 1, 0));
 	}
 	
 	public void updateTransform(Vector3 position, Quaternion rotation, Nucleotide from) {
@@ -135,11 +134,14 @@ public class Nucleotide : MonoBehaviour {
 	}
 
 	public void setColor(Color c) {
+		Debug.Log(c);
 		this.color = c;
-		gameObject.GetComponent<Renderer> ().material.color = c;
+		gameObject.GetComponent<Renderer>().material.color = c;
 	}
 
 	public Color getColor() {
+		if (this.color == Color.black)
+			return Color.white;
 		return this.color;
 	}
 }

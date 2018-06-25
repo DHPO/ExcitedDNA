@@ -95,11 +95,11 @@ public class NucleotideCouple : MonoBehaviour
         float helixRatioPrev = needHelix || (prev && prev.needHelix) ? helixRatio : 0;
         float helixRatioNext = needHelix || (next && next.needHelix) ? helixRatio : 0;
         //nucleotide1.transform.eulerAngles = new Vector3(-45, transform.localEulerAngles.y, 0);
-        nucleotide1.prevBond.transform.eulerAngles = new Vector3(-45 * helixRatioPrev, transform.localEulerAngles.y, -9 * helixRatioPrev);
-        nucleotide1.nextBond.transform.eulerAngles = new Vector3(-45 * helixRatioNext, transform.localEulerAngles.y,  9 * helixRatioNext);
+        nucleotide1.prevBond.transform.eulerAngles = new Vector3(-45 * helixRatioPrev + transform.localEulerAngles.x, transform.localEulerAngles.y, -9 * helixRatioPrev + transform.localEulerAngles.z);
+        nucleotide1.nextBond.transform.eulerAngles = new Vector3(-45 * helixRatioNext + transform.localEulerAngles.x, transform.localEulerAngles.y,  9 * helixRatioNext + transform.localEulerAngles.z);
         //nucleotide2.transform.eulerAngles = new Vector3(45, transform.localEulerAngles.y, 180);
-        nucleotide2.prevBond.transform.eulerAngles = new Vector3( 45 * helixRatioPrev, transform.localEulerAngles.y,  9 * helixRatioPrev);
-        nucleotide2.nextBond.transform.eulerAngles = new Vector3( 45 * helixRatioNext, transform.localEulerAngles.y, -9 * helixRatioNext);
+        nucleotide2.prevBond.transform.eulerAngles = new Vector3( 45 * helixRatioPrev + transform.localEulerAngles.x, transform.localEulerAngles.y,  9 * helixRatioPrev + transform.localEulerAngles.z);
+        nucleotide2.nextBond.transform.eulerAngles = new Vector3( 45 * helixRatioNext + transform.localEulerAngles.x, transform.localEulerAngles.y, -9 * helixRatioNext + transform.localEulerAngles.z);
     }
 
     void FixedUpdate () {
@@ -149,9 +149,17 @@ public class NucleotideCouple : MonoBehaviour
         nucleotide2.setType(t2);
     }
 
+    public Nucleotide.Type getLeftType() {
+        return nucleotide1.type;
+    }
+
+    public Nucleotide.Type getRightType() {
+        return nucleotide2.type;
+    }
+
     public void updateTransform(Vector3 position, Quaternion rotation, NucleotideCouple from) {
 		this.transform.position = position;
-		//this.transform.rotation = rotation;
+		this.transform.rotation = rotation;
 
 		if (prev && from != prev) {
 			Quaternion prevRotation = rotation;
@@ -183,12 +191,20 @@ public class NucleotideCouple : MonoBehaviour
         this.nucleotide2.setColor(c);
     }
 
-    public void setColor(Color c, bool markLeft) {
-        if (markLeft) {
-            this.nucleotide1.setColor(c);
-        }
-        else {
-            this.nucleotide2.setColor(c);
-        }
+    public void setLeftColor(Color c) {
+        Debug.Log(c);
+        this.nucleotide1.setColor(c);
+    }
+
+    public void setRightColor(Color c) {
+        this.nucleotide2.setColor(c);
+    }
+
+    public Color getLeftColor() {
+        return this.nucleotide1.getColor();
+    }
+
+    public Color getRightColor() {
+        return this.nucleotide2.getColor();
     }
 }

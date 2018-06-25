@@ -5,6 +5,9 @@ using UnityEngine;
 public class NucleotideDirector : MonoBehaviour {
 	private static NucleotideDirector instance;
 	public GameObject couplePrefab;
+	public GameObject singlePrefab;
+
+	private bool duplicating = false;
 
 	void Awake() {
 		instance = this;
@@ -14,15 +17,26 @@ public class NucleotideDirector : MonoBehaviour {
 		return instance;
 	}
 
-	public NucleotideCouple buildCoupleFromOneSingle(Nucleotide n) {
+	public NucleotideCouple buildCoupleFromOneSingle(Nucleotide n, bool reverse = false) {
 		if (n.isPaired)
 			return null;
 		GameObject couple = Instantiate(couplePrefab) as GameObject;
 		couple.transform.position = n.transform.position;
 		couple.transform.rotation = n.transform.rotation;
         
-		couple.gameObject.GetComponent<NucleotideCouple>().setType(n.type, getPairType(n.type));
-		couple.gameObject.GetComponent<NucleotideCouple>().setColor(n.getColor(), true);
+        if (!reverse) {
+        	couple.gameObject.GetComponent<NucleotideCouple>().setType(n.type, getPairType(n.type));
+			Color c = n.getColor();
+			couple.gameObject.GetComponent<NucleotideCouple>().setLeftColor(c);
+			couple.gameObject.GetComponent<NucleotideCouple>().setRightColor(Color.white);
+        }
+        else {
+        	couple.gameObject.GetComponent<NucleotideCouple>().setType(getPairType(n.type), n.type);
+			Color c = n.getColor();
+			couple.gameObject.GetComponent<NucleotideCouple>().setRightColor(c);
+			couple.gameObject.GetComponent<NucleotideCouple>().setLeftColor(Color.white);
+        }
+		
         couple.gameObject.GetComponent<NucleotideCouple>().tag= "NucleotideCouple";
         
         Destroy(n.gameObject);
@@ -39,23 +53,22 @@ public class NucleotideDirector : MonoBehaviour {
     //}
    
 
-	public void buildCoupleChainFromOneSingle(Nucleotide n) {
+	public NucleotideCouple buildCoupleChainFromOneSingle(Nucleotide n, bool reverse=false) {
 		if (n.isPaired)
-			return;
-		/* */
+			return null;
 
 		Nucleotide head = getHeadOfSingleChain(n);
 		Nucleotide next = head.next;
 		if (next == null) {
-			buildCoupleFromOneSingle(head);
+			return buildCoupleFromOneSingle(head);
 		}
 		else {
-			NucleotideCouple coupleHead = buildCoupleFromOneSingle(n);
+			NucleotideCouple coupleHead = buildCoupleFromOneSingle(head);
 			NucleotideCouple couple = coupleHead;
 
 			while(next.next) {
 				next = next.next;
-				couple.next = buildCoupleFromOneSingle(next.prev);
+				couple.next = buildCoupleFromOneSingle(next.prev, reverse);
 				couple.next.prev = couple;
                 
                 couple = couple.next;
@@ -63,7 +76,13 @@ public class NucleotideDirector : MonoBehaviour {
 			couple.next = buildCoupleFromOneSingle(next);
            
             couple.next.prev = couple;
-			coupleHead.broadcastUpdateTransform();
+            if (!reverse) {
+            	coupleHead.broadcastUpdateTransform();
+            }
+			else {
+				couple.next.broadcastUpdateTransform();
+			}
+			return coupleHead;
 		}
 	}
 
@@ -101,6 +120,105 @@ public class NucleotideDirector : MonoBehaviour {
 			head = head.prev;
 
 		return head;
+	}
+
+	public void duplicateCoupleChain (NucleotideCouple chain) {
+		if (duplicating)
+			return;
+		duplicating = true;
+		NucleotideCouple head = getHeadOfCoupleChain(chain);
+		StartCoroutine(duplicateCoupleChainRoutine(head));
+	}
+
+	IEnumerator duplicateCoupleChainRoutine (NucleotideCouple head) {
+		Debug.Log("DeHelix");
+		deHelixCoupleChain(head);
+		yield return new WaitForSeconds(5);
+		Debug.Log("Build Single Chain");
+		List<Nucleotide> singles = buildSingleChainsFromCouple(head);
+		yield return new WaitForSeconds(5);
+		NucleotideCouple c1 = buildCoupleChainFromOneSingle(singles[0]);
+		NucleotideCouple c2 = buildCoupleChainFromOneSingle(singles[1]);
+		deHelixCoupleChain(c1);
+		deHelixCoupleChain(c2);
+		yield return new WaitForSeconds(2);
+		helixCoupleChain(c1);
+		helixCoupleChain(c2);
+		duplicating = false;
+	}
+
+	public List<Nucleotide> buildSingleChainsFromCouple (NucleotideCouple head) {
+		Nucleotide leftHead, left, rightTail, right;
+		NucleotideCouple curr = head;
+
+		leftHead = left = (Instantiate(singlePrefab) as GameObject).GetComponent<Nucleotide>();
+		rightTail = right = (Instantiate(singlePrefab) as GameObject).GetComponent<Nucleotide>();
+		left.setType(curr.getLeftType());
+		left.setColor(curr.getLeftColor());
+		right.setType(curr.getRightType());
+		right.setColor(curr.getRightColor());
+
+		leftHead.transform.rotation = curr.nucleotide1.transform.rotation;
+		leftHead.transform.position = curr.nucleotide1.transform.position + leftHead.transform.rotation * Vector3.left * 2.0F;
+		rightTail.transform.rotation = curr.nucleotide2.transform.rotation;
+		rightTail.transform.position = curr.nucleotide2.transform.position + rightTail.transform.rotation * Vector3.left * 2.0F;
+		
+		curr = curr.next;
+		while (curr) {
+			Nucleotide leftPrev, rightPrev;
+			leftPrev = left;
+			left = (Instantiate(singlePrefab) as GameObject).GetComponent<Nucleotide>();
+			leftPrev.next = left;
+			left.prev = leftPrev;
+			left.setType(curr.getLeftType());
+			left.setColor(curr.getLeftColor());
+
+			rightPrev = right;
+			right = (Instantiate(singlePrefab) as GameObject).GetComponent<Nucleotide>();
+			right.next = rightPrev;
+			rightPrev.prev = right;
+			right.setType(curr.getRightType());
+			right.setColor(curr.getRightColor());
+
+			curr = curr.next;
+			/*if (head)
+				Destroy(head.prev);*/
+		}
+		leftHead.broadcastUpdateTransform();
+		rightTail.broadcastUpdateTransform();
+
+		destroyCoupleChain(head);
+
+		List<Nucleotide> result = new List<Nucleotide>();
+		result.Add(leftHead);
+		result.Add(rightTail);
+		return result;
+	}
+
+	public void deHelixCoupleChain (NucleotideCouple chain) {
+		NucleotideCouple n = getHeadOfCoupleChain(chain);
+		while (n) {
+			n.needHelix = false;
+			n = n.next;
+		}
+	}
+
+	public void destroyCoupleChain (NucleotideCouple chain) {
+		NucleotideCouple prev, head = getHeadOfCoupleChain(chain);
+		while (head) {
+			prev = head;
+			head = head.next;
+			Destroy(prev.gameObject);
+		}
+		Debug.Log("Destroyed");
+	}
+
+	public void helixCoupleChain (NucleotideCouple chain) {
+		NucleotideCouple n = getHeadOfCoupleChain(chain);
+		while (n) {
+			n.needHelix = true;
+			n = n.next;
+		}
 	}
 
 	public Nucleotide.Type getPairType(Nucleotide.Type t) {
