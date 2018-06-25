@@ -46,7 +46,7 @@ public class NucleotideCouple : MonoBehaviour
         nucleotide1.isPaired = true;
         nucleotide2.isPaired = true;
 
-        transform.Rotate(new Vector3(0, angularX));
+        transform.Rotate(transform.rotation * new Vector3(0, angularX, 0));
         
         angularX = 0;
         float helixRatio = 0; /* 0: no helix; 1: totally helix */
@@ -97,11 +97,11 @@ public class NucleotideCouple : MonoBehaviour
         float helixRatioPrev = needHelix || (prev && prev.needHelix) ? helixRatio : 0;
         float helixRatioNext = needHelix || (next && next.needHelix) ? helixRatio : 0;
         //nucleotide1.transform.eulerAngles = new Vector3(-45, transform.localEulerAngles.y, 0);
-        nucleotide1.prevBond.transform.eulerAngles = new Vector3(-45 * helixRatioPrev, transform.localEulerAngles.y, -9 * helixRatioPrev);
-        nucleotide1.nextBond.transform.eulerAngles = new Vector3(-45 * helixRatioNext, transform.localEulerAngles.y,  9 * helixRatioNext);
+        nucleotide1.prevBond.transform.eulerAngles = new Vector3(-45 * helixRatioPrev + transform.localEulerAngles.x, transform.localEulerAngles.y, -9 * helixRatioPrev + transform.localEulerAngles.z);
+        nucleotide1.nextBond.transform.eulerAngles = new Vector3(-45 * helixRatioNext + transform.localEulerAngles.x, transform.localEulerAngles.y,  9 * helixRatioNext + transform.localEulerAngles.z);
         //nucleotide2.transform.eulerAngles = new Vector3(45, transform.localEulerAngles.y, 180);
-        nucleotide2.prevBond.transform.eulerAngles = new Vector3( 45 * helixRatioPrev, transform.localEulerAngles.y,  9 * helixRatioPrev);
-        nucleotide2.nextBond.transform.eulerAngles = new Vector3( 45 * helixRatioNext, transform.localEulerAngles.y, -9 * helixRatioNext);
+        nucleotide2.prevBond.transform.eulerAngles = new Vector3( 45 * helixRatioPrev + transform.localEulerAngles.x, transform.localEulerAngles.y,  9 * helixRatioPrev + transform.localEulerAngles.z);
+        nucleotide2.nextBond.transform.eulerAngles = new Vector3( 45 * helixRatioNext + transform.localEulerAngles.x, transform.localEulerAngles.y, -9 * helixRatioNext + transform.localEulerAngles.z);
     }
 
     void FixedUpdate () {
@@ -180,32 +180,41 @@ public class NucleotideCouple : MonoBehaviour
         }
     }
 
-    public void updateTransform(Vector3 position, Quaternion rotation, NucleotideCouple from) {
+    public Nucleotide.Type getLeftType() {
+        return nucleotide1.type;
+    }
+
+    public Nucleotide.Type getRightType() {
+        return nucleotide2.type;
+    }
+
+    public void updateTransform(Vector3 position, Quaternion rotation, NucleotideCouple from, bool updateRotation=false) {
 		this.transform.position = position;
-		//this.transform.rotation = rotation;
+        if (updateRotation)
+		  this.transform.rotation = rotation;
 
 		if (prev && from != prev) {
 			Quaternion prevRotation = rotation;
 			Vector3 prevPosition = position + rotation * Vector3.up * gap;
-			prev.updateTransform(prevPosition, prevRotation, this);
+			prev.updateTransform(prevPosition, prevRotation, this, updateRotation);
 		}
 		if (next && from != next) {
 			Quaternion nextRotation = rotation;
 			Vector3 nextPosition = position + rotation * Vector3.down * gap;
-			next.updateTransform(nextPosition, nextRotation, this);
+			next.updateTransform(nextPosition, nextRotation, this, updateRotation);
 		}
 	}
 
-	public void broadcastUpdateTransform() {
+	public void broadcastUpdateTransform(bool updateRotation = false) {
 		if (prev) {
 			Quaternion prevRotation = this.transform.rotation;
 			Vector3 prevPosition = this.transform.position + this.transform.rotation * Vector3.up * gap;
-			prev.updateTransform(prevPosition, prevRotation, this);
+			prev.updateTransform(prevPosition, prevRotation, this, updateRotation);
 		}
 		if (next) {
 			Quaternion nextRotation = this.transform.rotation;
 			Vector3 nextPosition = this.transform.position + this.transform.rotation * Vector3.down * gap;
-			next.updateTransform(nextPosition, nextRotation, this);
+			next.updateTransform(nextPosition, nextRotation, this, updateRotation);
 		}
 	}
 
@@ -214,12 +223,20 @@ public class NucleotideCouple : MonoBehaviour
         this.nucleotide2.setColor(c);
     }
 
-    public void setColor(Color c, bool markLeft) {
-        if (markLeft) {
-            this.nucleotide1.setColor(c);
-        }
-        else {
-            this.nucleotide2.setColor(c);
-        }
+    public void setLeftColor(Color c) {
+        Debug.Log(c);
+        this.nucleotide1.setColor(c);
+    }
+
+    public void setRightColor(Color c) {
+        this.nucleotide2.setColor(c);
+    }
+
+    public Color getLeftColor() {
+        return this.nucleotide1.getColor();
+    }
+
+    public Color getRightColor() {
+        return this.nucleotide2.getColor();
     }
 }
