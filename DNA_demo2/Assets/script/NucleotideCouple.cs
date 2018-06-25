@@ -182,4 +182,18 @@ public class NucleotideCouple : MonoBehaviour
 			next.updateTransform(nextPosition, nextRotation, this);
 		}
 	}
+
+    public void setColor(Color c) {
+        this.nucleotide1.setColor(c);
+        this.nucleotide2.setColor(c);
+    }
+
+    public void setColor(Color c, bool markLeft) {
+        if (markLeft) {
+            this.nucleotide1.setColor(c);
+        }
+        else {
+            this.nucleotide2.setColor(c);
+        }
+    }
 }
