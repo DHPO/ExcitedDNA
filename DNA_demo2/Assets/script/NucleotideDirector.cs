@@ -14,15 +14,15 @@ public class NucleotideDirector : MonoBehaviour {
 		return instance;
 	}
 
-    public NucleotideCouple buildCoupleFromOneSingle(Nucleotide n) {
-        if (n.isPaired)
-            return null;
-        GameObject couple = Instantiate(couplePrefab) as GameObject;
-        couple.transform.position = n.transform.position;
-        couple.transform.rotation = n.transform.rotation;
-
-        couple.gameObject.GetComponent<NucleotideCouple>().setType(n.type, getPairType(n.type));
-        couple.gameObject.GetComponent<NucleotideCouple>().tag = "NucleotideCouple";
+	public NucleotideCouple buildCoupleFromOneSingle(Nucleotide n) {
+		if (n.isPaired)
+			return null;
+		GameObject couple = Instantiate(couplePrefab) as GameObject;
+		couple.transform.position = n.transform.position;
+		couple.transform.rotation = n.transform.rotation;
+        
+		couple.gameObject.GetComponent<NucleotideCouple>().setType(n.type, getPairType(n.type));
+        couple.gameObject.GetComponent<NucleotideCouple>().tag= "NucleotideCouple";
         
         Destroy(n.gameObject);
 		return couple.gameObject.GetComponent<NucleotideCouple>();

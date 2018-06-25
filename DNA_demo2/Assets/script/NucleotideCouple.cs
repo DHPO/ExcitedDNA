@@ -13,7 +13,7 @@ public class NucleotideCouple : MonoBehaviour
     public float gap = 1.5F;
     public Nucleotide nucleotide1;
     public Nucleotide nucleotide2;
-    public GameObject HydrogenBond;
+
     private float angle = 36;
     private bool hasPrev, hasNext;
     private float angularX;
@@ -147,11 +147,6 @@ public class NucleotideCouple : MonoBehaviour
     public void setType(Nucleotide.Type t1, Nucleotide.Type t2) {
         nucleotide1.setType(t1);
         nucleotide2.setType(t2);
-        if (t1 == Nucleotide.Type.A || t1 == Nucleotide.Type.T)
-        {//A T只有两条氢键，要使最中间一条不显示{
-            Debug.Log("AT has two bond");
-            HydrogenBond.SetActive(false);
-        }
     }
 
     public void updateTransform(Vector3 position, Quaternion rotation, NucleotideCouple from) {
