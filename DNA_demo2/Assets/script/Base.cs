@@ -9,19 +9,19 @@ public class Base : MonoBehaviour {
 		switch (t)
 		{
 			case Nucleotide.Type.A:
-				setColor(new Color(1, 0, 0, 0));
+				setColor(new Color(255, 0, 0));
 				setText("A");
 				break;
 			case Nucleotide.Type.T:
-				setColor(new Color(1, 1, 0, 0));
+				setColor(new Color(255, 255, 0));
 				setText("T");
 				break;
 			case Nucleotide.Type.C:
-				setColor(new Color(0, 1, 0, 0));
+				setColor(new Color(0, 255, 0));
 				setText("C");
 				break;
 			case Nucleotide.Type.G:
-				setColor(new Color(0, 0, 1, 0));
+				setColor(new Color(0, 0, 255));
 				setText("G");
 				break;
 		}

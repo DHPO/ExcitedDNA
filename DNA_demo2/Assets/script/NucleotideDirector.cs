@@ -14,7 +14,6 @@ public class NucleotideDirector : MonoBehaviour {
 		return instance;
 	}
 
-<<<<<<< HEAD
     public NucleotideCouple buildCoupleFromOneSingle(Nucleotide n) {
         if (n.isPaired)
             return null;
@@ -24,18 +23,6 @@ public class NucleotideDirector : MonoBehaviour {
 
         couple.gameObject.GetComponent<NucleotideCouple>().setType(n.type, getPairType(n.type));
         couple.gameObject.GetComponent<NucleotideCouple>().tag = "NucleotideCouple";
-=======
-	public NucleotideCouple buildCoupleFromOneSingle(Nucleotide n) {
-		if (n.isPaired)
-			return null;
-		GameObject couple = Instantiate(couplePrefab) as GameObject;
-		couple.transform.position = n.transform.position;
-		couple.transform.rotation = n.transform.rotation;
-        
-		couple.gameObject.GetComponent<NucleotideCouple>().setType(n.type, getPairType(n.type));
-		couple.gameObject.GetComponent<NucleotideCouple>().setColor(n.getColor(), true);
-        couple.gameObject.GetComponent<NucleotideCouple>().tag= "NucleotideCouple";
->>>>>>> 6352ab5f916ee99bc6d77a13188ed781fbce3e5f
         
         Destroy(n.gameObject);
 		return couple.gameObject.GetComponent<NucleotideCouple>();
@@ -49,7 +36,6 @@ public class NucleotideDirector : MonoBehaviour {
     //        n.needHelix = false;
     //    }
     //}
-   
 
 	public void buildCoupleChainFromOneSingle(Nucleotide n) {
 		if (n.isPaired)
@@ -78,37 +64,10 @@ public class NucleotideDirector : MonoBehaviour {
 		}
 	}
 
-	public void markCoupleChain( NucleotideCouple chain, Color c) {
-		NucleotideCouple n = getHeadOfCoupleChain(chain);
-
-		while (n) {
-			n.setColor(c);
-			n = n.next;
-		}
-	}
-
-	public void markSingleChain (Nucleotide chain, Color c) {
-		Nucleotide n = getHeadOfSingleChain(chain);
-
-		while (n) {
-			n.setColor(c);
-			n = n.next;
-		}
-	}
-
 	public Nucleotide getHeadOfSingleChain(Nucleotide n) {
 		Nucleotide head = n;
 
 		while(head.prev)
-			head = head.prev;
-
-		return head;
-	}
-
-	public NucleotideCouple getHeadOfCoupleChain(NucleotideCouple n) {
-		NucleotideCouple head = n;
-
-		while (head.prev)
 			head = head.prev;
 
 		return head;
