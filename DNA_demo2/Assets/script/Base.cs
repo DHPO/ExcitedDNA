@@ -24,7 +24,11 @@ public class Base : MonoBehaviour {
 				setColor(new Color(0, 0, 1, 0));
 				setText("G");
 				break;
-		}
+            case Nucleotide.Type.U:
+                setColor(new Color(0, 1, 1, 0));
+                setText("U");
+                break;
+        }
 	}
 
 	private void setColor(Color c) {
