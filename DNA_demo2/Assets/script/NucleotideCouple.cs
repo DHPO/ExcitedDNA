@@ -152,7 +152,7 @@ public class NucleotideCouple : MonoBehaviour
         nucleotide2.setType(t2);
         if (t1 == Nucleotide.Type.A || t1 == Nucleotide.Type.T)
         {//A T只有两条氢键，要使最中间一条不显示{
-            Debug.Log("A/T has two bond");
+            //Debug.Log("A/T has two bond");
             HydrogenBond2.SetActive(false);
         }
     }
@@ -166,7 +166,18 @@ public class NucleotideCouple : MonoBehaviour
 
     public void deHelix()
     {
-
+        NucleotideCouple pre = prev;
+        NucleotideCouple nex = next;
+        while (pre != null)
+        {
+            pre.needHelix = false;
+            pre = pre.prev;
+        }
+        while(nex != null)
+        {
+            nex.needHelix = false;
+            nex = nex.next;
+        }
     }
 
     public void updateTransform(Vector3 position, Quaternion rotation, NucleotideCouple from) {
