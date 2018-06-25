@@ -46,7 +46,7 @@ public class NucleotideCouple : MonoBehaviour
         nucleotide1.isPaired = true;
         nucleotide2.isPaired = true;
 
-        transform.Rotate(new Vector3(0, angularX));
+        transform.Rotate(transform.rotation * new Vector3(0, angularX, 0));
         
         angularX = 0;
         float helixRatio = 0; /* 0: no helix; 1: totally helix */
@@ -188,32 +188,33 @@ public class NucleotideCouple : MonoBehaviour
         return nucleotide2.type;
     }
 
-    public void updateTransform(Vector3 position, Quaternion rotation, NucleotideCouple from) {
+    public void updateTransform(Vector3 position, Quaternion rotation, NucleotideCouple from, bool updateRotation=false) {
 		this.transform.position = position;
-		this.transform.rotation = rotation;
+        if (updateRotation)
+		  this.transform.rotation = rotation;
 
 		if (prev && from != prev) {
 			Quaternion prevRotation = rotation;
 			Vector3 prevPosition = position + rotation * Vector3.up * gap;
-			prev.updateTransform(prevPosition, prevRotation, this);
+			prev.updateTransform(prevPosition, prevRotation, this, updateRotation);
 		}
 		if (next && from != next) {
 			Quaternion nextRotation = rotation;
 			Vector3 nextPosition = position + rotation * Vector3.down * gap;
-			next.updateTransform(nextPosition, nextRotation, this);
+			next.updateTransform(nextPosition, nextRotation, this, updateRotation);
 		}
 	}
 
-	public void broadcastUpdateTransform() {
+	public void broadcastUpdateTransform(bool updateRotation = false) {
 		if (prev) {
 			Quaternion prevRotation = this.transform.rotation;
 			Vector3 prevPosition = this.transform.position + this.transform.rotation * Vector3.up * gap;
-			prev.updateTransform(prevPosition, prevRotation, this);
+			prev.updateTransform(prevPosition, prevRotation, this, updateRotation);
 		}
 		if (next) {
 			Quaternion nextRotation = this.transform.rotation;
 			Vector3 nextPosition = this.transform.position + this.transform.rotation * Vector3.down * gap;
-			next.updateTransform(nextPosition, nextRotation, this);
+			next.updateTransform(nextPosition, nextRotation, this, updateRotation);
 		}
 	}
 

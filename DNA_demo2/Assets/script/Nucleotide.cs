@@ -70,6 +70,9 @@ public class Nucleotide : MonoBehaviour {
 
 	// Update is called once per frame
 	void FixedUpdate () {
+		prevBond.SetActive(prev!=null);
+		nextBond.SetActive(next!=null);
+		
 		try{
 			if (gameObject.GetComponent<clickmove>().isDraging() || gameObject.GetComponent<VRTK_InteractableObject>().IsGrabbed())
 				broadcastUpdateTransform();
