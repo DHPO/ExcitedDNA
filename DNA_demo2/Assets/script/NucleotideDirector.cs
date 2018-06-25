@@ -42,6 +42,7 @@ public class NucleotideDirector : MonoBehaviour {
 	public void buildCoupleChainFromOneSingle(Nucleotide n) {
 		if (n.isPaired)
 			return;
+		/* */
 
 		Nucleotide head = getHeadOfSingleChain(n);
 		Nucleotide next = head.next;
