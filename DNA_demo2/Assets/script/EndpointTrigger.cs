@@ -57,7 +57,8 @@ public class EndpointTrigger : MonoBehaviour {
                     else
                         return;
                 }
-                cutter.exchangeSeq();//切一次成功后要对调切割点前后seq，以便切另一边
+
+                //cutter.exchangeSeq();切一次成功后要对调切割点前后seq，以便切另一边
 				attached = false;
 				parent.cutPrev();
 			}

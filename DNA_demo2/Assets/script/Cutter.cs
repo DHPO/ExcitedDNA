@@ -20,10 +20,13 @@ public class Cutter : MonoBehaviour {
         Debug.Log("hello");
     }
 
-    public void exchangeSeq()//切一侧之后在另一侧应该是对称的，得把判断的seq对换一下，因为我们的couple不分左右，似乎没法达到切割双条链时判断方向调换
-    {
-        string tmp = seqAfterCutPoint;
-        seqAfterCutPoint = seqBeforeCutPoint;
-        seqBeforeCutPoint = tmp;
-    }
+    //public void exchangeSeq()//切一侧之后在另一侧应该是对称的，得把判断的seq对换一下，因为我们的couple不分左右，似乎没法达到切割双条链时判断方向调换
+    //{
+    //    string tmp = seqAfterCutPoint;
+    //    seqAfterCutPoint = seqBeforeCutPoint;
+    //    seqBeforeCutPoint = tmp;
+    //}
+
+
+
 }

@@ -13,7 +13,9 @@ public class NucleotideCouple : MonoBehaviour
     public float gap = 1.5F;
     public Nucleotide nucleotide1;
     public Nucleotide nucleotide2;
-
+    public GameObject HydrogenBond1;
+    public GameObject HydrogenBond2;
+    public GameObject HydrogenBond3;
     private float angle = 36;
     private bool hasPrev, hasNext;
     private float angularX;
@@ -144,9 +146,38 @@ public class NucleotideCouple : MonoBehaviour
 
     }
 
-    public void setType(Nucleotide.Type t1, Nucleotide.Type t2) {
+    public void setType(Nucleotide.Type t1, Nucleotide.Type t2)
+    {
         nucleotide1.setType(t1);
         nucleotide2.setType(t2);
+        if (t1 == Nucleotide.Type.A || t1 == Nucleotide.Type.T)
+        {//A T只有两条氢键，要使最中间一条不显示{
+            //Debug.Log("A/T has two bond");
+            HydrogenBond2.SetActive(false);
+        }
+    }
+
+    public void hideHydrogenBond()
+    {
+        HydrogenBond1.SetActive(false);
+        HydrogenBond2.SetActive(false);
+        HydrogenBond3.SetActive(false);
+    }
+
+    public void deHelix()
+    {
+        NucleotideCouple pre = prev;
+        NucleotideCouple nex = next;
+        while (pre != null)
+        {
+            pre.needHelix = false;
+            pre = pre.prev;
+        }
+        while(nex != null)
+        {
+            nex.needHelix = false;
+            nex = nex.next;
+        }
     }
 
     public Nucleotide.Type getLeftType() {
