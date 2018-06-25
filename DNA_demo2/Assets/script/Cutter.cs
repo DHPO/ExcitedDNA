@@ -26,4 +26,7 @@ public class Cutter : MonoBehaviour {
         seqAfterCutPoint = seqBeforeCutPoint;
         seqBeforeCutPoint = tmp;
     }
+
+
+
 }
