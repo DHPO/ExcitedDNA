@@ -29,6 +29,7 @@ GameObject:
   - component: {fileID: 114900903077678220}
   - component: {fileID: 54619361424559130}
   - component: {fileID: 114343831836847862}
+  - component: {fileID: 114704392400751710}
   m_Layer: 0
   m_Name: Nucleotide
   m_TagString: Nucleotide
@@ -718,7 +719,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1017232182078238}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a3abaf4521bf2344ea21ed3020b98eb2, type: 3}
   m_Name: 
@@ -782,6 +783,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc1cb464694664354b296227f3935227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &114704392400751710
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1017232182078238}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c08517e04830d6d44a13c5ea5f574181, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  active: 1
+  unhighlightOnDisable: 1
+  thickness: 1
+  customOutlineModels: []
+  customOutlineModelPaths: []
+  enableSubmeshHighlight: 0
 --- !u!114 &114900903077678220
 MonoBehaviour:
   m_ObjectHideFlags: 1
