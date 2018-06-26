@@ -23,7 +23,7 @@ public class NucleotideDirector : MonoBehaviour {
 		GameObject couple = Instantiate(couplePrefab) as GameObject;
 		couple.transform.position = n.transform.position;
 		couple.transform.rotation = n.transform.rotation;
-        
+
         if (!reverse) {
         	couple.gameObject.GetComponent<NucleotideCouple>().setType(n.type, getPairType(n.type));
 			Color c = n.getColor();
@@ -36,7 +36,6 @@ public class NucleotideDirector : MonoBehaviour {
 			couple.gameObject.GetComponent<NucleotideCouple>().setRightColor(c);
 			couple.gameObject.GetComponent<NucleotideCouple>().setLeftColor(Color.white);
         }
-		
         couple.gameObject.GetComponent<NucleotideCouple>().tag= "NucleotideCouple";
         
         Destroy(n.gameObject);
@@ -51,7 +50,6 @@ public class NucleotideDirector : MonoBehaviour {
     //        n.needHelix = false;
     //    }
     //}
-   
 
 	public NucleotideCouple buildCoupleChainFromOneSingle(Nucleotide n, bool reverse=false) {
 		if (n.isPaired)
@@ -166,24 +164,6 @@ public class NucleotideDirector : MonoBehaviour {
 		destroySingleChain(c1);
 		destroySingleChain(c2);
 		return n;
-	}
-
-	public void markCoupleChain( NucleotideCouple chain, Color c) {
-		NucleotideCouple n = getHeadOfCoupleChain(chain);
-
-		while (n) {
-			n.setColor(c);
-			n = n.next;
-		}
-	}
-
-	public void markSingleChain (Nucleotide chain, Color c) {
-		Nucleotide n = getHeadOfSingleChain(chain);
-
-		while (n) {
-			n.setColor(c);
-			n = n.next;
-		}
 	}
 
 	public Nucleotide getHeadOfSingleChain(Nucleotide n) {

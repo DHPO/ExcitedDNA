@@ -18,8 +18,6 @@ public class Nucleotide : MonoBehaviour {
 
 	public static float gap = 1.5F;
 
-	private Color color;
-
 	public enum Type{Empty, A, T, C, G};
 	public Type type;
 
