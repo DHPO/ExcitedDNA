@@ -259,12 +259,11 @@ public class NucleotideDirector : MonoBehaviour {
             yield break;
         }
 
-        Debug.Log("Break 失败！");
         // 转录第一个序列
         n = n.next;
         Nucleotide curRNA = (Instantiate(rnaPrefab) as GameObject).GetComponent<Nucleotide>();
         curRNA.setType(getPairType(n.getLeftType(), true)); // 使用isRNA模式，A对应U
-        curRNA.transform.position = n.transform.position + new Vector3(Nucleotide.gap, 0, 0);
+        curRNA.transform.position = n.transform.position + n.transform.rotation * Vector3.right * 2 * Nucleotide.gap;
         curRNA.transform.rotation = n.transform.rotation;
         yield return new WaitForSeconds(1);
 
@@ -278,7 +277,7 @@ public class NucleotideDirector : MonoBehaviour {
             // 转录
             Nucleotide rna = (Instantiate(rnaPrefab) as GameObject).GetComponent<Nucleotide>();
             rna.setType(getPairType(n.getLeftType(), true));
-            rna.transform.position = n.transform.position + new Vector3(Nucleotide.gap, 0, 0);
+            rna.transform.position = n.transform.position + n.transform.rotation * Vector3.right * 2 * Nucleotide.gap;
             rna.transform.rotation = n.transform.rotation;
             rna.addPrev(curRNA);
             curRNA = rna;
