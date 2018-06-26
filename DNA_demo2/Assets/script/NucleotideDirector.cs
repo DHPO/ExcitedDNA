@@ -43,17 +43,58 @@ public class NucleotideDirector : MonoBehaviour {
 		return couple.gameObject.GetComponent<NucleotideCouple>();
 	}
 
-    //核苷酸之间氢键角度不知道怎么归位，deHelix先注释掉了
-    //public void deHelix(NucleotideCouple n)
-    //{
-    //    if(n.needHelix == true)
-    //    {
-    //        n.needHelix = false;
-    //    }
-    //}
-   
 
-	public NucleotideCouple buildCoupleChainFromOneSingle(Nucleotide n, bool reverse=false) {
+    public NucleotideCouple buildCoupleFromOneSingleWithoutDestroy(Nucleotide n)
+    {
+        Debug.Log("start build");
+        GameObject couple = Instantiate(couplePrefab) as GameObject;
+        couple.transform.position = n.transform.position;
+        couple.transform.rotation = n.transform.rotation;
+        Debug.Log("instantiate complete");
+        couple.gameObject.GetComponent<NucleotideCouple>().setType(n.type, getPairType(n.type));
+        couple.gameObject.GetComponent<NucleotideCouple>().tag = "NucleotideCouple";
+        couple.gameObject.GetComponent<NucleotideCouple>().needHelix = false;
+        couple.gameObject.GetComponent<NucleotideCouple>().setColor(Color.white);
+        Debug.Log("config complete");
+        return couple.gameObject.GetComponent<NucleotideCouple>();
+    }
+
+    public NucleotideCouple buildCoupleChainFromOneDirection(NucleotideCouple nc, int direction)//1 is up, 0 is down
+    {
+        NucleotideCouple coupleHead = buildCoupleFromOneSingleWithoutDestroy(nc.nucleotide1);
+        NucleotideCouple couple = coupleHead;
+        if (direction == 1)
+        {
+            NucleotideCouple pre = nc.prev;
+
+            while (pre)
+            {
+                
+                couple.prev = buildCoupleFromOneSingleWithoutDestroy(pre.nucleotide1);
+                couple.prev.next = couple;
+                pre = pre.prev;
+                couple = couple.prev;
+            }
+
+        }
+        else
+        {
+            NucleotideCouple nex = nc.next;
+
+            while (nex)
+            {
+                couple.next = buildCoupleFromOneSingleWithoutDestroy(nex.nucleotide1);
+                couple.next.prev = couple;
+                nex = nex.next;
+                couple = couple.next;
+            }
+
+
+        }
+        coupleHead.broadcastUpdateTransform();
+        return coupleHead;
+    }
+    public NucleotideCouple buildCoupleChainFromOneSingle(Nucleotide n, bool reverse=false) {
 		if (n.isPaired)
 			return null;
 
@@ -404,6 +445,7 @@ public class NucleotideDirector : MonoBehaviour {
 
     public Nucleotide.Type Char2Type(char t)
     {
+        
         switch (t)
         {
             case 'A':
