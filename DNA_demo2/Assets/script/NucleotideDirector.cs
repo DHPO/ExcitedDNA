@@ -86,7 +86,57 @@ public class NucleotideDirector : MonoBehaviour {
 		}
 	}
 
+	public NucleotideCouple buildCoupleChainFromOneSingleAnimation(Nucleotide chain, float timeGap = 0.8F) {
+		NucleotideCouple head = buildHalfCoupleChainFromOneSingle(chain);
+		if (head == null)
+			return null;
+		StartCoroutine(fillHalfCoupleChainRoutine(head, timeGap));
+		return head;
+	}
+
+	public IEnumerator fillHalfCoupleChainRoutine(NucleotideCouple head, float timeGap = 0.1F) {
+		while (head) {
+			head.setType(head.nucleotide1.type, getPairType(head.nucleotide1.type));
+			head.setRightColor(Color.white);
+			head.needHelix = true;
+			head = head.next;
+			yield return new WaitForSeconds(timeGap);
+		}
+	}
+
+	public NucleotideCouple buildHalfCoupleChainFromOneSingle(Nucleotide chain) {
+		if (chain.isPaired)
+			return null;
+
+		chain = getHeadOfSingleChain(chain);
+		Nucleotide nhead = chain;
+
+		NucleotideCouple n = (Instantiate(couplePrefab) as GameObject).GetComponent<NucleotideCouple>();
+		NucleotideCouple head = n;
+		n.setLeftColor(chain.getColor()); 
+		n.setType(chain.type, Nucleotide.Type.Empty);
+		n.needHelix = false;
+		while (chain.next) {
+			chain = chain.next;
+			n.next = (Instantiate(couplePrefab) as GameObject).GetComponent<NucleotideCouple>();
+			n.next.setLeftColor(chain.getColor()); 
+			n.next.setType(chain.type, Nucleotide.Type.Empty);
+			n.next.prev = n;
+			n.next.needHelix = false;
+			n.next.transform.rotation = nhead.transform.rotation;
+			n = n.next;
+		}
+		head.transform.rotation = nhead.transform.rotation;
+		head.transform.position = nhead.transform.position;
+		head.broadcastUpdateTransform();
+		destroySingleChain(chain);
+		return head;
+	}
+
 	public NucleotideCouple buildCoupleChainFromTwoSingles(Nucleotide c1, Nucleotide c2, Vector3 position = default(Vector3)) {
+		if (c1.isPaired || c2.isPaired)
+			return null;
+
 		if (getLengthOfSingleChain(c1) != getLengthOfSingleChain(c2))
 			return null;
 
@@ -188,8 +238,8 @@ public class NucleotideDirector : MonoBehaviour {
 		Debug.Log("Build Single Chain");
 		List<Nucleotide> singles = buildSingleChainsFromCouple(head);
 		yield return new WaitForSeconds(5);
-		NucleotideCouple c1 = buildCoupleChainFromOneSingle(singles[0]);
-		NucleotideCouple c2 = buildCoupleChainFromOneSingle(singles[1]);
+		NucleotideCouple c1 = buildCoupleChainFromOneSingleAnimation(singles[0]);
+		NucleotideCouple c2 = buildCoupleChainFromOneSingleAnimation(singles[1]);
 		deHelixCoupleChain(c1);
 		deHelixCoupleChain(c2);
 		yield return new WaitForSeconds(2);

@@ -39,10 +39,10 @@ public class NucleotideCouple : MonoBehaviour
         nucleotide2.enableDrag(false);
 
         /* test */
-        nucleotide1.prevBond.SetActive(prev!=null);
-        nucleotide2.prevBond.SetActive(prev!=null);
-        nucleotide2.nextBond.SetActive(next!=null);
-        nucleotide1.nextBond.SetActive(next!=null);
+        nucleotide1.prevBond.SetActive(prev!=null && nucleotide1.type != Nucleotide.Type.Empty && prev.nucleotide1.type != Nucleotide.Type.Empty);
+        nucleotide2.prevBond.SetActive(prev!=null && nucleotide2.type != Nucleotide.Type.Empty && prev.nucleotide2.type != Nucleotide.Type.Empty);
+        nucleotide2.nextBond.SetActive(next!=null && nucleotide2.type != Nucleotide.Type.Empty && next.nucleotide2.type != Nucleotide.Type.Empty);
+        nucleotide1.nextBond.SetActive(next!=null && nucleotide1.type != Nucleotide.Type.Empty && next.nucleotide1.type != Nucleotide.Type.Empty);
         nucleotide1.isPaired = true;
         nucleotide2.isPaired = true;
 
@@ -153,11 +153,23 @@ public class NucleotideCouple : MonoBehaviour
         if (t1 == Nucleotide.Type.A || t1 == Nucleotide.Type.T)
         {//A T只有两条氢键，要使最中间一条不显示{
             //Debug.Log("A/T has two bond");
+            HydrogenBond1.SetActive(true);
             HydrogenBond2.SetActive(false);
+            HydrogenBond3.SetActive(true);
+        }
+        else if (t1 == Nucleotide.Type.C || t1 == Nucleotide.Type.G) {
+            HydrogenBond1.SetActive(true);
+            HydrogenBond2.SetActive(true);
+            HydrogenBond3.SetActive(true);
         }
         if (NucleotideDirector.getInstance().getPairType(t1) != t2 && t1 != Nucleotide.Type.Empty && t2 != Nucleotide.Type.Empty) {
             nucleotide1.gameObject.GetComponent<Renderer>().material.color = Color.red;
             nucleotide2.gameObject.GetComponent<Renderer>().material.color = Color.red;
+            HydrogenBond1.SetActive(false);
+            HydrogenBond2.SetActive(false);
+            HydrogenBond3.SetActive(false);
+        }
+        if (t1 == Nucleotide.Type.Empty || t2 == Nucleotide.Type.Empty) {
             HydrogenBond1.SetActive(false);
             HydrogenBond2.SetActive(false);
             HydrogenBond3.SetActive(false);
