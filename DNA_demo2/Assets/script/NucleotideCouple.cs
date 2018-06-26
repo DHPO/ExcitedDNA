@@ -19,6 +19,8 @@ public class NucleotideCouple : MonoBehaviour
     private float angle = 36;
     private bool hasPrev, hasNext;
     private float angularX;
+    private float helixRatio;
+    private bool lastState = false;
 
 
     // Use this for initialization
@@ -49,7 +51,7 @@ public class NucleotideCouple : MonoBehaviour
         transform.Rotate(transform.rotation * new Vector3(0, angularX, 0));
         
         angularX = 0;
-        float helixRatio = 0; /* 0: no helix; 1: totally helix */
+        helixRatio = 0; /* 0: no helix; 1: totally helix */
 
         if (needHelix)
         {
@@ -253,17 +255,23 @@ public class NucleotideCouple : MonoBehaviour
         float helixRatioPrev = needHelix || (prev && prev.needHelix) ? helixRatio : 0;
         float helixRatioNext = needHelix || (next && next.needHelix) ? helixRatio : 0;
         //nucleotide1.transform.eulerAngles = new Vector3(-45, transform.localEulerAngles.y, 0);
-        nucleotide1.prevBond.transform.eulerAngles = new Vector3(-45 * helixRatioPrev + transform.localEulerAngles.x, transform.localEulerAngles.y, -9 * helixRatioPrev + transform.localEulerAngles.z);
-        nucleotide1.nextBond.transform.eulerAngles = new Vector3(-45 * helixRatioNext + transform.localEulerAngles.x, transform.localEulerAngles.y,  9 * helixRatioNext + transform.localEulerAngles.z);
+        nucleotide1.prevBond.transform.eulerAngles = new Vector3(-45 * helixRatioPrev + transform.eulerAngles.x, transform.eulerAngles.y, -9 * helixRatioPrev + transform.eulerAngles.z);
+        nucleotide1.nextBond.transform.eulerAngles = new Vector3(-45 * helixRatioNext + transform.eulerAngles.x, transform.eulerAngles.y,  9 * helixRatioNext + transform.eulerAngles.z);
         //nucleotide2.transform.eulerAngles = new Vector3(45, transform.localEulerAngles.y, 180);
-        nucleotide2.prevBond.transform.eulerAngles = new Vector3( 45 * helixRatioPrev + transform.localEulerAngles.x, transform.localEulerAngles.y,  9 * helixRatioPrev + transform.localEulerAngles.z);
-        nucleotide2.nextBond.transform.eulerAngles = new Vector3( 45 * helixRatioNext + transform.localEulerAngles.x, transform.localEulerAngles.y, -9 * helixRatioNext + transform.localEulerAngles.z);
+        nucleotide2.prevBond.transform.eulerAngles = new Vector3( 45 * helixRatioPrev + transform.eulerAngles.x, transform.eulerAngles.y,  9 * helixRatioPrev + transform.eulerAngles.z);
+        nucleotide2.nextBond.transform.eulerAngles = new Vector3( 45 * helixRatioNext + transform.eulerAngles.x, transform.eulerAngles.y, -9 * helixRatioNext + transform.eulerAngles.z);
     }
 
     void FixedUpdate () {
 		try{
-			if (gameObject.GetComponent<clickmove>().isDraging() || gameObject.GetComponent<VRTK_InteractableObject>().IsGrabbed())
-				broadcastUpdateTransform();
+			if (gameObject.GetComponent<clickmove>().isDraging() || gameObject.GetComponent<VRTK_InteractableObject>().IsGrabbed()) {
+				broadcastUpdateTransform(true);
+                lastState = true;
+            }
+            else if (lastState) {
+                broadcastUpdateTransform(true);
+                lastState = false;
+            }
 		}
 		catch(System.Exception) {}
 
@@ -351,16 +359,22 @@ public class NucleotideCouple : MonoBehaviour
 
     public void updateTransform(Vector3 position, Quaternion rotation, NucleotideCouple from, bool updateRotation=false) {
 		this.transform.position = position;
-        if (updateRotation)
-		  this.transform.rotation = rotation;
+        this.transform.parent = from.transform.parent;
+        if (updateRotation) {
+		    this.transform.rotation = rotation;
+            if (from == next)
+                this.transform.eulerAngles += rotation * new Vector3(0, -36, 0) * helixRatio;
+            else
+                this.transform.eulerAngles += rotation * new Vector3(0, 36, 0) * helixRatio;
+        }
 
 		if (prev && from != prev) {
-			Quaternion prevRotation = rotation;
+			Quaternion prevRotation = this.transform.rotation;
 			Vector3 prevPosition = position + rotation * Vector3.up * gap;
 			prev.updateTransform(prevPosition, prevRotation, this, updateRotation);
 		}
 		if (next && from != next) {
-			Quaternion nextRotation = rotation;
+			Quaternion nextRotation = this.transform.rotation;
 			Vector3 nextPosition = position + rotation * Vector3.down * gap;
 			next.updateTransform(nextPosition, nextRotation, this, updateRotation);
 		}
