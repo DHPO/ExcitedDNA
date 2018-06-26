@@ -7,7 +7,7 @@ public class NucleotideDirector : MonoBehaviour {
 	public GameObject couplePrefab;
 	public GameObject singlePrefab;
 
-	private bool duplicating = false;
+	private bool animating = false;
 
 	void Awake() {
 		instance = this;
@@ -90,6 +90,7 @@ public class NucleotideDirector : MonoBehaviour {
 		NucleotideCouple head = buildHalfCoupleChainFromOneSingle(chain);
 		if (head == null)
 			return null;
+		animating = true;
 		StartCoroutine(fillHalfCoupleChainRoutine(head, timeGap));
 		return head;
 	}
@@ -102,6 +103,7 @@ public class NucleotideDirector : MonoBehaviour {
 			head = head.next;
 			yield return new WaitForSeconds(timeGap);
 		}
+		animating = false;
 	}
 
 	public NucleotideCouple buildHalfCoupleChainFromOneSingle(Nucleotide chain) {
@@ -224,9 +226,9 @@ public class NucleotideDirector : MonoBehaviour {
 	}
 
 	public void duplicateCoupleChain (NucleotideCouple chain) {
-		if (duplicating)
+		if (animating)
 			return;
-		duplicating = true;
+		animating = true;
 		NucleotideCouple head = getHeadOfCoupleChain(chain);
 		StartCoroutine(duplicateCoupleChainRoutine(head));
 	}
@@ -238,14 +240,10 @@ public class NucleotideDirector : MonoBehaviour {
 		Debug.Log("Build Single Chain");
 		List<Nucleotide> singles = buildSingleChainsFromCouple(head);
 		yield return new WaitForSeconds(5);
+		animating = false;
 		NucleotideCouple c1 = buildCoupleChainFromOneSingleAnimation(singles[0]);
-		NucleotideCouple c2 = buildCoupleChainFromOneSingleAnimation(singles[1]);
-		deHelixCoupleChain(c1);
-		deHelixCoupleChain(c2);
-		yield return new WaitForSeconds(2);
-		helixCoupleChain(c1);
-		helixCoupleChain(c2);
-		duplicating = false;
+		animating = false;
+		NucleotideCouple c2 = buildCoupleChainFromOneSingleAnimation(singles[1]);	
 	}
 
 	public List<Nucleotide> buildSingleChainsFromCouple (NucleotideCouple head) {

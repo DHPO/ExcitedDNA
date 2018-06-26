@@ -12,6 +12,8 @@ public class CoupleFromTwoSingleTrigger : MonoBehaviour {
 	void OnTriggerEnter(Collider other) {
 		if (other.tag == "Nucleotide") {
 			Nucleotide n = other.gameObject.GetComponent<Nucleotide>();
+			if (n.isPaired)
+				return;
 			if (waiting) {
 				NucleotideDirector.getInstance().buildCoupleChainFromTwoSingles(waiting, n, transform.position);
 				waiting = null;
