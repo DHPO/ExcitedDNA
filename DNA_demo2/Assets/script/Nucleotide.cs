@@ -20,7 +20,7 @@ public class Nucleotide : MonoBehaviour {
 
 	private Color color;
 
-	public enum Type{Empty, A, T, C, G};
+	public enum Type{Empty, A, T, C, G, U};
 	public Type type;
 
 	public bool isPaired = false;

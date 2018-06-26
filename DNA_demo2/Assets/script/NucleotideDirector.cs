@@ -6,10 +6,11 @@ public class NucleotideDirector : MonoBehaviour {
 	private static NucleotideDirector instance;
 	public GameObject couplePrefab;
 	public GameObject singlePrefab;
+    public GameObject rnaPrefab;
 
 	private bool animating = false;
 
-	void Awake() {
+    void Awake() {
 		instance = this;
 	}
 
@@ -231,9 +232,18 @@ public class NucleotideDirector : MonoBehaviour {
 		animating = true;
 		NucleotideCouple head = getHeadOfCoupleChain(chain);
 		StartCoroutine(duplicateCoupleChainRoutine(head));
-	}
+    }
 
-	IEnumerator duplicateCoupleChainRoutine (NucleotideCouple head) {
+    public void transcriptFromCoupleChain(NucleotideCouple chain, string StartPoint, string EndPoint)
+    {
+        if (animating)
+            return;
+        animating = true;
+        NucleotideCouple head = getHeadOfCoupleChain(chain);
+        StartCoroutine(transcriptFromCoupleChainRoutine(head, StartPoint, EndPoint));
+    }
+
+    IEnumerator duplicateCoupleChainRoutine (NucleotideCouple head) {
 		Debug.Log("DeHelix");
 		deHelixCoupleChain(head);
 		yield return new WaitForSeconds(5);
@@ -294,7 +304,105 @@ public class NucleotideDirector : MonoBehaviour {
 		return result;
 	}
 
-	public void deHelixCoupleChain (NucleotideCouple chain) {
+    IEnumerator transcriptFromCoupleChainRoutine(NucleotideCouple n, string StartPoint, string EndPoint)
+    {
+        Queue<Nucleotide.Type> tempQueue = new Queue<Nucleotide.Type>();
+        bool match = false;
+
+        // 查找启动子
+        for (int i = 0; i < StartPoint.Length; i++)
+        {
+            tempQueue.Enqueue(Nucleotide.Type.Empty);
+        }
+        tempQueue.Dequeue();
+        tempQueue.Enqueue(n.getLeftType());
+        while (n.next && !match)
+        {
+            n = n.next;
+            tempQueue.Dequeue();
+            tempQueue.Enqueue(n.getLeftType());
+
+            match = true;
+            Queue<Nucleotide.Type> checkQueue = new Queue<Nucleotide.Type>(tempQueue);
+            for (int i = 0; i< StartPoint.Length; i++)
+            {
+                if (checkQueue.Dequeue() != Char2Type(StartPoint[i]))
+                {
+                    match = false;
+                    break;
+                }
+            }
+        }
+        if (!match)
+        {
+            Debug.Log("没有找到启动子！");
+            animating = false;
+            yield break;
+        }
+
+        // 转录同时检测终止子，遇到终止子停止转录
+
+        // 当前n是启动子序列最后一个，不需要转录
+        tempQueue.Clear();
+        for (int i = 0; i < EndPoint.Length; i++)
+        {
+            tempQueue.Enqueue(Nucleotide.Type.Empty);
+        }
+
+        match = false;
+        if (!n.next)
+        {
+            Debug.Log("没有东西可以转录！");
+            animating = false;
+            yield break;
+        }
+
+        // 转录第一个序列
+        n = n.next;
+        Nucleotide curRNA = (Instantiate(rnaPrefab) as GameObject).GetComponent<Nucleotide>();
+        curRNA.setType(getPairType(n.getLeftType(), true)); // 使用isRNA模式，A对应U
+        curRNA.transform.position = n.transform.position + n.transform.rotation * Vector3.right * 2 * Nucleotide.gap;
+        curRNA.transform.rotation = n.transform.rotation;
+        yield return new WaitForSeconds(1);
+
+        // 终止子长度肯定大于1，这里就不检测了
+        tempQueue.Dequeue();
+        tempQueue.Enqueue(n.getLeftType());
+
+        while (n.next && !match)
+        {
+            n = n.next;
+            // 转录
+            Nucleotide rna = (Instantiate(rnaPrefab) as GameObject).GetComponent<Nucleotide>();
+            rna.setType(getPairType(n.getLeftType(), true));
+            rna.transform.position = n.transform.position + n.transform.rotation * Vector3.right * 2 * Nucleotide.gap;
+            rna.transform.rotation = n.transform.rotation;
+            rna.addPrev(curRNA);
+            curRNA = rna;
+            yield return new WaitForSeconds(1);
+
+            tempQueue.Dequeue();
+            tempQueue.Enqueue(n.getLeftType());
+
+            match = true;
+            Queue<Nucleotide.Type> checkQueue = new Queue<Nucleotide.Type>(tempQueue);
+            for (int i = 0; i < EndPoint.Length; i++)
+            {
+                if (checkQueue.Dequeue() != Char2Type(EndPoint[i]))
+                {
+                    match = false;
+                    break;
+                }
+            }
+        }
+        if (!match)
+        {
+            Debug.Log("没有找到终止子！");
+        }
+        animating = false;
+    }
+
+    public void deHelixCoupleChain (NucleotideCouple chain) {
 		NucleotideCouple n = getHeadOfCoupleChain(chain);
 		while (n) {
 			n.needHelix = false;
@@ -390,10 +498,13 @@ public class NucleotideDirector : MonoBehaviour {
 		switch (t)
 		{
 			case Nucleotide.Type.A:
-				return Nucleotide.Type.T;
+                if (isRNA) return Nucleotide.Type.U;
+                else return Nucleotide.Type.T;
 			case Nucleotide.Type.T:
 				return Nucleotide.Type.A;
-			case Nucleotide.Type.C:
+            case Nucleotide.Type.U:
+                return Nucleotide.Type.A;
+            case Nucleotide.Type.C:
 				return Nucleotide.Type.G;
 			case Nucleotide.Type.G:
 				return Nucleotide.Type.C;
@@ -414,6 +525,8 @@ public class NucleotideDirector : MonoBehaviour {
                 return Nucleotide.Type.T;
             case 'C':
                 return Nucleotide.Type.C;
+            case 'U':
+                return Nucleotide.Type.U;
             default:
                 return Nucleotide.Type.Empty;
         }
