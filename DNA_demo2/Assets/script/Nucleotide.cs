@@ -68,6 +68,9 @@ public class Nucleotide : MonoBehaviour {
 
 	// Update is called once per frame
 	void FixedUpdate () {
+		prevBond.SetActive(prev!=null);
+		nextBond.SetActive(next!=null);
+		
 		try{
 			if (gameObject.GetComponent<clickmove>().isDraging() || gameObject.GetComponent<VRTK_InteractableObject>().IsGrabbed())
 				broadcastUpdateTransform();
@@ -129,5 +132,20 @@ public class Nucleotide : MonoBehaviour {
 	public void enableDrag(bool isEnabled) {
 		clickmove c = gameObject.GetComponent<clickmove>();
 		c.enabled = isEnabled;
+	}
+
+	public void setColor(Color c) {
+		Debug.Log(c);
+		if (this.color == Color.black)
+			c = Color.white;
+		this.color = c;
+		gameObject.GetComponent<Renderer>().material.color = c;
+	}
+
+	public Color getColor() {
+		/*if (this.color == Color.black)
+			return Color.white;
+		return this.color;*/
+		return gameObject.GetComponent<Renderer>().material.color;
 	}
 }
