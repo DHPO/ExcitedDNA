@@ -9,8 +9,9 @@ public class NucleotideDirector : MonoBehaviour {
     public GameObject rnaPrefab;
 
 	private bool duplicating = false;
+    private bool transcripting = false;
 
-	void Awake() {
+    void Awake() {
 		instance = this;
 	}
 
@@ -129,9 +130,18 @@ public class NucleotideDirector : MonoBehaviour {
 		duplicating = true;
 		NucleotideCouple head = getHeadOfCoupleChain(chain);
 		StartCoroutine(duplicateCoupleChainRoutine(head));
-	}
+    }
 
-	IEnumerator duplicateCoupleChainRoutine (NucleotideCouple head) {
+    public void transcriptFromCoupleChain(NucleotideCouple chain, string StartPoint, string EndPoint)
+    {
+        if (transcripting)
+            return;
+        transcripting = true;
+        NucleotideCouple head = getHeadOfCoupleChain(chain);
+        StartCoroutine(transcriptFromCoupleChainRoutine(head, StartPoint, EndPoint));
+    }
+
+    IEnumerator duplicateCoupleChainRoutine (NucleotideCouple head) {
 		Debug.Log("DeHelix");
 		deHelixCoupleChain(head);
 		yield return new WaitForSeconds(5);
@@ -195,11 +205,10 @@ public class NucleotideDirector : MonoBehaviour {
 		result.Add(rightTail);
 		return result;
 	}
-    
-    public void transcriptFromCoupleChain(NucleotideCouple chain, string StartPoint, string EndPoint)
+
+    IEnumerator transcriptFromCoupleChainRoutine(NucleotideCouple n, string StartPoint, string EndPoint)
     {
         Queue<Nucleotide.Type> tempQueue = new Queue<Nucleotide.Type>();
-        NucleotideCouple n = getHeadOfCoupleChain(chain);
         bool match = false;
 
         // 查找启动子
@@ -229,7 +238,8 @@ public class NucleotideDirector : MonoBehaviour {
         if (!match)
         {
             Debug.Log("没有找到启动子！");
-            return;
+            transcripting = false;
+            yield break;
         }
 
         // 转录同时检测终止子，遇到终止子停止转录
@@ -245,15 +255,18 @@ public class NucleotideDirector : MonoBehaviour {
         if (!n.next)
         {
             Debug.Log("没有东西可以转录！");
-            return;
+            transcripting = false;
+            yield break;
         }
 
+        Debug.Log("Break 失败！");
         // 转录第一个序列
         n = n.next;
         Nucleotide curRNA = (Instantiate(rnaPrefab) as GameObject).GetComponent<Nucleotide>();
         curRNA.setType(getPairType(n.getLeftType(), true)); // 使用isRNA模式，A对应U
         curRNA.transform.position = n.transform.position + new Vector3(Nucleotide.gap, 0, 0);
         curRNA.transform.rotation = n.transform.rotation;
+        yield return new WaitForSeconds(1);
 
         // 终止子长度肯定大于1，这里就不检测了
         tempQueue.Dequeue();
@@ -265,8 +278,11 @@ public class NucleotideDirector : MonoBehaviour {
             // 转录
             Nucleotide rna = (Instantiate(rnaPrefab) as GameObject).GetComponent<Nucleotide>();
             rna.setType(getPairType(n.getLeftType(), true));
+            rna.transform.position = n.transform.position + new Vector3(Nucleotide.gap, 0, 0);
+            rna.transform.rotation = n.transform.rotation;
             rna.addPrev(curRNA);
             curRNA = rna;
+            yield return new WaitForSeconds(1);
 
             tempQueue.Dequeue();
             tempQueue.Enqueue(n.getLeftType());
@@ -285,8 +301,8 @@ public class NucleotideDirector : MonoBehaviour {
         if (!match)
         {
             Debug.Log("没有找到终止子！");
-            return;
         }
+        transcripting = false;
     }
 
     public void deHelixCoupleChain (NucleotideCouple chain) {
