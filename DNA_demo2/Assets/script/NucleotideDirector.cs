@@ -210,9 +210,9 @@ public class NucleotideDirector : MonoBehaviour {
 	public int getLengthOfSingleChain(Nucleotide n) {
 		Nucleotide head = getHeadOfSingleChain(n);
 		int cnt = 1;
-		while (n.next) {
+		while (head.next) {
 			cnt += 1;
-			n = n.next;
+			head = head.next;
 		}
 		return cnt;
 	}
