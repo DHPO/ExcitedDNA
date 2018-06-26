@@ -494,7 +494,7 @@ public class NucleotideDirector : MonoBehaviour {
 		return n;
 	}
 
-	public Nucleotide.Type getPairType(Nucleotide.Type t) {
+	public Nucleotide.Type getPairType(Nucleotide.Type t, bool isRNA=false) {
 		switch (t)
 		{
 			case Nucleotide.Type.A:
