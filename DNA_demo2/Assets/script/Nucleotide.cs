@@ -138,13 +138,16 @@ public class Nucleotide : MonoBehaviour {
 
 	public void setColor(Color c) {
 		Debug.Log(c);
+		if (this.color == Color.black)
+			c = Color.white;
 		this.color = c;
 		gameObject.GetComponent<Renderer>().material.color = c;
 	}
 
 	public Color getColor() {
-		if (this.color == Color.black)
+		/*if (this.color == Color.black)
 			return Color.white;
-		return this.color;
+		return this.color;*/
+		return gameObject.GetComponent<Renderer>().material.color;
 	}
 }

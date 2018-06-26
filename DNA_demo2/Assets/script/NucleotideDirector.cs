@@ -8,8 +8,7 @@ public class NucleotideDirector : MonoBehaviour {
 	public GameObject singlePrefab;
     public GameObject rnaPrefab;
 
-	private bool duplicating = false;
-    private bool transcripting = false;
+	private bool animating = false;
 
     void Awake() {
 		instance = this;
@@ -88,6 +87,90 @@ public class NucleotideDirector : MonoBehaviour {
 		}
 	}
 
+	public NucleotideCouple buildCoupleChainFromOneSingleAnimation(Nucleotide chain, float timeGap = 0.8F) {
+		NucleotideCouple head = buildHalfCoupleChainFromOneSingle(chain);
+		if (head == null)
+			return null;
+		animating = true;
+		StartCoroutine(fillHalfCoupleChainRoutine(head, timeGap));
+		return head;
+	}
+
+	public IEnumerator fillHalfCoupleChainRoutine(NucleotideCouple head, float timeGap = 0.1F) {
+		while (head) {
+			head.setType(head.nucleotide1.type, getPairType(head.nucleotide1.type));
+			head.setRightColor(Color.white);
+			head.needHelix = true;
+			head = head.next;
+			yield return new WaitForSeconds(timeGap);
+		}
+		animating = false;
+	}
+
+	public NucleotideCouple buildHalfCoupleChainFromOneSingle(Nucleotide chain) {
+		if (chain.isPaired)
+			return null;
+
+		chain = getHeadOfSingleChain(chain);
+		Nucleotide nhead = chain;
+
+		NucleotideCouple n = (Instantiate(couplePrefab) as GameObject).GetComponent<NucleotideCouple>();
+		NucleotideCouple head = n;
+		n.setLeftColor(chain.getColor()); 
+		n.setType(chain.type, Nucleotide.Type.Empty);
+		n.needHelix = false;
+		while (chain.next) {
+			chain = chain.next;
+			n.next = (Instantiate(couplePrefab) as GameObject).GetComponent<NucleotideCouple>();
+			n.next.setLeftColor(chain.getColor()); 
+			n.next.setType(chain.type, Nucleotide.Type.Empty);
+			n.next.prev = n;
+			n.next.needHelix = false;
+			n.next.transform.rotation = nhead.transform.rotation;
+			n = n.next;
+		}
+		head.transform.rotation = nhead.transform.rotation;
+		head.transform.position = nhead.transform.position;
+		head.broadcastUpdateTransform();
+		destroySingleChain(chain);
+		return head;
+	}
+
+	public NucleotideCouple buildCoupleChainFromTwoSingles(Nucleotide c1, Nucleotide c2, Vector3 position = default(Vector3)) {
+		if (c1.isPaired || c2.isPaired)
+			return null;
+
+		if (getLengthOfSingleChain(c1) != getLengthOfSingleChain(c2))
+			return null;
+
+		c1 = getHeadOfSingleChain(c1);
+		if (c1 == getHeadOfSingleChain(c2))
+			return null;
+
+		c2 = getTailOfSingleChain(c2);
+
+		NucleotideCouple n = (Instantiate(couplePrefab) as GameObject).GetComponent<NucleotideCouple>();
+		NucleotideCouple head = n;
+		n.setLeftColor(c1.getColor()); 
+		n.setRightColor(c2.getColor());
+		n.setType(c1.type, c2.type);
+		while (c1.next) {
+			c1 = c1.next;
+			c2 = c2.prev;
+			n.next = (Instantiate(couplePrefab) as GameObject).GetComponent<NucleotideCouple>();
+			n.next.setLeftColor(c1.getColor()); 
+			n.next.setRightColor(c2.getColor());
+			n.next.setType(c1.type, c2.type);
+			n.next.prev = n;
+			n = n.next;
+		}
+		head.transform.position = position;
+		head.broadcastUpdateTransform();
+		destroySingleChain(c1);
+		destroySingleChain(c2);
+		return n;
+	}
+
 	public void markCoupleChain( NucleotideCouple chain, Color c) {
 		NucleotideCouple n = getHeadOfCoupleChain(chain);
 
@@ -115,6 +198,25 @@ public class NucleotideDirector : MonoBehaviour {
 		return head;
 	}
 
+	public Nucleotide getTailOfSingleChain(Nucleotide n) {
+		Nucleotide tail = n;
+
+		while (tail.next)
+			tail = tail.next;
+
+		return tail;
+	}
+
+	public int getLengthOfSingleChain(Nucleotide n) {
+		Nucleotide head = getHeadOfSingleChain(n);
+		int cnt = 1;
+		while (n.next) {
+			cnt += 1;
+			n = n.next;
+		}
+		return cnt;
+	}
+
 	public NucleotideCouple getHeadOfCoupleChain(NucleotideCouple n) {
 		NucleotideCouple head = n;
 
@@ -125,18 +227,18 @@ public class NucleotideDirector : MonoBehaviour {
 	}
 
 	public void duplicateCoupleChain (NucleotideCouple chain) {
-		if (duplicating)
+		if (animating)
 			return;
-		duplicating = true;
+		animating = true;
 		NucleotideCouple head = getHeadOfCoupleChain(chain);
 		StartCoroutine(duplicateCoupleChainRoutine(head));
     }
 
     public void transcriptFromCoupleChain(NucleotideCouple chain, string StartPoint, string EndPoint)
     {
-        if (transcripting)
+        if (animating)
             return;
-        transcripting = true;
+        animating = true;
         NucleotideCouple head = getHeadOfCoupleChain(chain);
         StartCoroutine(transcriptFromCoupleChainRoutine(head, StartPoint, EndPoint));
     }
@@ -148,14 +250,10 @@ public class NucleotideDirector : MonoBehaviour {
 		Debug.Log("Build Single Chain");
 		List<Nucleotide> singles = buildSingleChainsFromCouple(head);
 		yield return new WaitForSeconds(5);
-		NucleotideCouple c1 = buildCoupleChainFromOneSingle(singles[0]);
-		NucleotideCouple c2 = buildCoupleChainFromOneSingle(singles[1]);
-		deHelixCoupleChain(c1);
-		deHelixCoupleChain(c2);
-		yield return new WaitForSeconds(2);
-		helixCoupleChain(c1);
-		helixCoupleChain(c2);
-		duplicating = false;
+		animating = false;
+		NucleotideCouple c1 = buildCoupleChainFromOneSingleAnimation(singles[0]);
+		animating = false;
+		NucleotideCouple c2 = buildCoupleChainFromOneSingleAnimation(singles[1]);	
 	}
 
 	public List<Nucleotide> buildSingleChainsFromCouple (NucleotideCouple head) {
@@ -238,7 +336,7 @@ public class NucleotideDirector : MonoBehaviour {
         if (!match)
         {
             Debug.Log("没有找到启动子！");
-            transcripting = false;
+            animating = false;
             yield break;
         }
 
@@ -255,7 +353,7 @@ public class NucleotideDirector : MonoBehaviour {
         if (!n.next)
         {
             Debug.Log("没有东西可以转录！");
-            transcripting = false;
+            animating = false;
             yield break;
         }
 
@@ -301,7 +399,7 @@ public class NucleotideDirector : MonoBehaviour {
         {
             Debug.Log("没有找到终止子！");
         }
-        transcripting = false;
+        animating = false;
     }
 
     public void deHelixCoupleChain (NucleotideCouple chain) {
@@ -322,6 +420,16 @@ public class NucleotideDirector : MonoBehaviour {
 		Debug.Log("Destroyed");
 	}
 
+	public void destroySingleChain (Nucleotide chain) {
+		Nucleotide prev, head = getHeadOfSingleChain(chain);
+		while (head) {
+			prev = head;
+			head = head.next;
+			Destroy(prev.gameObject);
+		}
+		Debug.Log("Destroyed");
+	}
+
 	public void helixCoupleChain (NucleotideCouple chain) {
 		NucleotideCouple n = getHeadOfCoupleChain(chain);
 		while (n) {
@@ -330,7 +438,63 @@ public class NucleotideDirector : MonoBehaviour {
 		}
 	}
 
-	public Nucleotide.Type getPairType(Nucleotide.Type t, bool isRNA = false) {
+	public string CoupleChain2String(NucleotideCouple chain) {
+		NucleotideCouple n = getHeadOfCoupleChain(chain);
+		string result = "2";
+		while (n) {
+			result += Type2Char(n.getLeftType()) + Type2Char(n.getRightType());
+			n = n.next;
+		}
+		return result;
+	}
+
+	public string SingleChain2String(Nucleotide chain) {
+		Nucleotide n = getHeadOfSingleChain(chain);
+		string result = "1";
+		while (n) {
+			result += Type2Char(n.type);
+			n = n.next;
+		}
+		return result;
+	}
+
+	public Nucleotide String2SingleChain(string s, Vector3 position = default(Vector3)) {
+		if (s[0] != '1')
+			return null;
+
+		Nucleotide n = (Instantiate(singlePrefab) as GameObject).GetComponent<Nucleotide>();
+		Nucleotide head = n;
+		n.setType(Char2Type(s[1]));
+		for (int i = 2; i < s.Length; i++) {
+			n.next = (Instantiate(singlePrefab) as GameObject).GetComponent<Nucleotide>();
+			n.next.setType(Char2Type(s[i]));
+			n.next.prev = n;
+			n = n.next;
+		}
+		head.transform.position = position;
+		head.broadcastUpdateTransform();
+		return head;
+	}
+
+	public NucleotideCouple String2CoupleChain(string s, Vector3 position = default(Vector3)) {
+		if (s[0] != '2')
+			return null;
+
+		NucleotideCouple n = (Instantiate(couplePrefab) as GameObject).GetComponent<NucleotideCouple>();
+		NucleotideCouple head = n;
+		n.setType(Char2Type(s[1]), Char2Type(s[2]));
+		for (int i = 3; i < s.Length; i+= 2) {
+			n.next = (Instantiate(couplePrefab) as GameObject).GetComponent<NucleotideCouple>();
+			n.next.setType(Char2Type(s[i]), Char2Type(s[i+1]));
+			n.next.prev = n;
+			n = n.next;
+		}
+		head.transform.position = position;
+		head.broadcastUpdateTransform();
+		return n;
+	}
+
+	public Nucleotide.Type getPairType(Nucleotide.Type t) {
 		switch (t)
 		{
 			case Nucleotide.Type.A:
@@ -366,5 +530,20 @@ public class NucleotideDirector : MonoBehaviour {
             default:
                 return Nucleotide.Type.Empty;
         }
+    }
+
+    public char Type2Char(Nucleotide.Type t) {
+    	switch (t) {
+    		case Nucleotide.Type.A:
+    			return 'A';
+    		case Nucleotide.Type.T:
+    			return 'T';
+    		case Nucleotide.Type.C:
+    			return 'C';
+    		case Nucleotide.Type.G:
+    			return 'G';
+    		default:
+    			return '-';
+    	}
     }
 }
