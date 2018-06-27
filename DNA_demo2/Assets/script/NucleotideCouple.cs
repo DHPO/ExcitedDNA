@@ -115,25 +115,22 @@ public class NucleotideCouple : MonoBehaviour
                     after = tmp;
                 }//对换两侧识别序列
                 NucleotideCouple top = up(before.Length),bottom = down(after.Length);
-
-
-
                 NucleotideCouple fromTop = n.buildCoupleChainFromOneDirection(top, 0);
                 NucleotideCouple fromBottom = n.buildCoupleChainFromOneDirection(bottom, 1);
                 NucleotideCouple downer = fromBottom, upper = fromTop  ;//用来遍历
                 //destroy original couple chain
                 n.destroyCoupleChain(n.getHeadOfCoupleChain(this));
-
                 int min_len = Math.Min(before.Length, after.Length);
                 int max_len = Math.Max(before.Length, after.Length);
-
-
                 for (int i = 0; i < max_len; i++)
                 {
+                    upper.gameObject.tag = "NucleotideCouplePart";
+                    downer.gameObject.tag = "NucleotideCouplePart";
                     if (i < min_len)
                     {
                         upper.gameObject.SetActive(false);
                         upper = upper.next;
+                        
 
                         downer.gameObject.SetActive(false);
                         downer = downer.prev;
@@ -158,7 +155,6 @@ public class NucleotideCouple : MonoBehaviour
                         downer = downer.prev;
                     }
                 }
-
                 fromTop.transform.position += new Vector3(0, -3, 0);
                 fromBottom.transform.position += new Vector3(0, 3, 0);
                 fromBottom.broadcastUpdateTransform();
@@ -169,6 +165,14 @@ public class NucleotideCouple : MonoBehaviour
             {
                 //Debug.Log("no match");
             }
+        }
+
+        if(other.tag == "NucleotideCouplePart")
+        {
+            NucleotideDirector n = NucleotideDirector.getInstance();
+            NucleotideCouple t2 = other.gameObject.GetComponent<NucleotideCouple>();
+            n.mergeTwo(n.getHeadOfCoupleChain(this),n.getHeadOfCoupleChain(t2));
+            Debug.Log("end merge");
         }
     }
 

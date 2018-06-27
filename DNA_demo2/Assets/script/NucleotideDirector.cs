@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System;
 public class NucleotideDirector : MonoBehaviour {
 	private static NucleotideDirector instance;
 	public GameObject couplePrefab;
@@ -43,6 +43,62 @@ public class NucleotideDirector : MonoBehaviour {
 		return couple.gameObject.GetComponent<NucleotideCouple>();
 	}
 
+    public void mergeTwo(NucleotideCouple upper,NucleotideCouple downer)
+    {
+        string sequence = "1",seqUp="",seqDown="";
+        NucleotideCouple upperHead, downerHead;
+        if(upper.nucleotide1.isActiveAndEnabled && upper.nucleotide2.isActiveAndEnabled)
+        {
+            upperHead = getHeadOfCoupleChain(upper);
+            downerHead = getHeadOfCoupleChain(downer);
+        }
+        else
+        {
+            upperHead = getHeadOfCoupleChain(downer);
+            downerHead = getHeadOfCoupleChain(upper);
+        }
+        while (upperHead)
+        {
+            if(upperHead.nucleotide1.isActiveAndEnabled && upperHead.nucleotide2.isActiveAndEnabled)//这部分是都显示的
+            {
+                sequence += Type2Char(upperHead.nucleotide1.type);
+            }
+            else if(upperHead.nucleotide1.isActiveAndEnabled || upperHead.nucleotide2.isActiveAndEnabled)//这部分是粘性末端，记录下来做比较
+            {
+                sequence += Type2Char(upperHead.nucleotide1.type);//这部分只能加进sequence里一次，下个while循环里不能加
+                if (upperHead.nucleotide1.isActiveAndEnabled) seqUp += Type2Char(upperHead.nucleotide1.type);
+                else seqUp += Type2Char(upperHead.nucleotide2.type);
+            }
+            upperHead = upperHead.next;
+        }
+
+        while (downerHead)
+        {
+            if(downerHead.nucleotide1.isActiveAndEnabled && downerHead.nucleotide2.isActiveAndEnabled)
+            {
+                sequence += Type2Char(downerHead.nucleotide1.type); //添加另一半
+            }
+            else if(downerHead.nucleotide1.isActiveAndEnabled || downerHead.nucleotide2.isActiveAndEnabled)
+            {
+                //Debug.Log(downerHead.nucleotide1.type);
+                if (downerHead.nucleotide1.isActiveAndEnabled) seqDown += Type2Char(downerHead.nucleotide2.type);
+                else seqDown += Type2Char(downerHead.nucleotide1.type);//注意这里跟上个while循环是反着来的，为了之后直接对比seqUp seqDown，一样的话就算match了
+            }
+            downerHead = downerHead.next;
+        }
+
+        Debug.Log(seqUp);
+        Debug.Log(seqDown);
+        //Debug.Log(sequence);
+        if(seqDown == seqUp)
+        {
+            Debug.Log("match");
+            Nucleotide headSingle = String2SingleChain(sequence);
+            destroyCoupleChain(upper);
+            destroyCoupleChain(downer);
+            NucleotideCouple headCouple = buildCoupleChainFromOneSingle(headSingle);
+        }
+    }
 
     public NucleotideCouple buildCoupleFromOneSingleWithoutDestroy(Nucleotide n)
     {
@@ -474,5 +530,12 @@ public class NucleotideDirector : MonoBehaviour {
     		default:
     			return '-';
     	}
+    }
+
+    public static string reverseString(string s)
+    {
+        char[] charArray = s.ToCharArray();
+        Array.Reverse(charArray);
+        return new string(charArray);
     }
 }
