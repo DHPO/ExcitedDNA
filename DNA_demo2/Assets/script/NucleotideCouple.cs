@@ -118,8 +118,6 @@ public class NucleotideCouple : MonoBehaviour
                 }//对换两侧识别序列
                 NucleotideCouple top = up(before.Length),bottom = down(after.Length);
 
-
-
                 NucleotideCouple fromTop = n.buildCoupleChainFromOneDirection(top, 0);
                 NucleotideCouple fromBottom = n.buildCoupleChainFromOneDirection(bottom, 1);
                 NucleotideCouple downer = fromBottom, upper = fromTop  ;//用来遍历
@@ -128,10 +126,10 @@ public class NucleotideCouple : MonoBehaviour
 
                 int min_len = Math.Min(before.Length, after.Length);
                 int max_len = Math.Max(before.Length, after.Length);
-
-
                 for (int i = 0; i < max_len; i++)
                 {
+                    upper.gameObject.tag = "NucleotideCouplePart";
+                    downer.gameObject.tag = "NucleotideCouplePart";
                     if (i < min_len)
                     {
                         upper.gameObject.SetActive(false);
@@ -171,6 +169,14 @@ public class NucleotideCouple : MonoBehaviour
             {
                 //Debug.Log("no match");
             }
+        }
+
+        if(other.tag == "NucleotideCouplePart")
+        {
+            NucleotideDirector n = NucleotideDirector.getInstance();
+            NucleotideCouple t2 = other.gameObject.GetComponent<NucleotideCouple>();
+            n.mergeTwo(n.getHeadOfCoupleChain(this),n.getHeadOfCoupleChain(t2));
+            Debug.Log("end merge");
         }
     }
 

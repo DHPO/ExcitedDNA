@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System;
 public class NucleotideDirector : MonoBehaviour {
 	private static NucleotideDirector instance;
 	public GameObject couplePrefab;
@@ -43,7 +43,63 @@ public class NucleotideDirector : MonoBehaviour {
         Destroy(n.gameObject);
 		return couple.gameObject.GetComponent<NucleotideCouple>();
 	}
+    
+    public void mergeTwo(NucleotideCouple upper,NucleotideCouple downer)
+    {
+        string sequence = "1",seqUp="",seqDown="";
+        NucleotideCouple upperHead, downerHead;
+        if(upper.nucleotide1.isActiveAndEnabled && upper.nucleotide2.isActiveAndEnabled)
+        {
+            upperHead = getHeadOfCoupleChain(upper);
+            downerHead = getHeadOfCoupleChain(downer);
+        }
+        else
+        {
+            upperHead = getHeadOfCoupleChain(downer);
+            downerHead = getHeadOfCoupleChain(upper);
+        }
+        while (upperHead)
+        {
+            if(upperHead.nucleotide1.isActiveAndEnabled && upperHead.nucleotide2.isActiveAndEnabled)//Õâ²¿·ÖÊÇ¶¼ÏÔÊ¾µÄ
+            {
+                sequence += Type2Char(upperHead.nucleotide1.type);
+            }
+            else if(upperHead.nucleotide1.isActiveAndEnabled || upperHead.nucleotide2.isActiveAndEnabled)//Õâ²¿·ÖÊÇÕ³ĞÔÄ©¶Ë£¬¼ÇÂ¼ÏÂÀ´×ö±È½Ï
+            {
+                sequence += Type2Char(upperHead.nucleotide1.type);//Õâ²¿·ÖÖ»ÄÜ¼Ó½øsequenceÀïÒ»´Î£¬ÏÂ¸öwhileÑ­»·Àï²»ÄÜ¼Ó
+                if (upperHead.nucleotide1.isActiveAndEnabled) seqUp += Type2Char(upperHead.nucleotide1.type);
+                else seqUp += Type2Char(upperHead.nucleotide2.type);
+            }
+            upperHead = upperHead.next;
+        }
 
+        while (downerHead)
+        {
+            if(downerHead.nucleotide1.isActiveAndEnabled && downerHead.nucleotide2.isActiveAndEnabled)
+            {
+                sequence += Type2Char(downerHead.nucleotide1.type); //Ìí¼ÓÁíÒ»°ë
+            }
+            else if(downerHead.nucleotide1.isActiveAndEnabled || downerHead.nucleotide2.isActiveAndEnabled)
+            {
+                //Debug.Log(downerHead.nucleotide1.type);
+                if (downerHead.nucleotide1.isActiveAndEnabled) seqDown += Type2Char(downerHead.nucleotide2.type);
+                else seqDown += Type2Char(downerHead.nucleotide1.type);//×¢ÒâÕâÀï¸úÉÏ¸öwhileÑ­»·ÊÇ·´×ÅÀ´µÄ£¬ÎªÁËÖ®ºóÖ±½Ó¶Ô±ÈseqUp seqDown£¬Ò»ÑùµÄ»°¾ÍËãmatchÁË
+            }
+            downerHead = downerHead.next;
+        }
+
+        Debug.Log(seqUp);
+        Debug.Log(seqDown);
+        //Debug.Log(sequence);
+        if(seqDown == seqUp)
+        {
+            Debug.Log("match");
+            Nucleotide headSingle = String2SingleChain(sequence);
+            destroyCoupleChain(upper);
+            destroyCoupleChain(downer);
+            NucleotideCouple headCouple = buildCoupleChainFromOneSingle(headSingle);
+        }
+    }
 
     public NucleotideCouple buildCoupleFromOneSingleWithoutDestroy(Nucleotide n)
     {
@@ -350,7 +406,7 @@ public class NucleotideDirector : MonoBehaviour {
         Queue<Nucleotide.Type> tempQueue = new Queue<Nucleotide.Type>();
         bool match = false;
 
-        // æŸ¥æ‰¾å¯åŠ¨å­
+        // æŸ¥æ‰¾å¯åŠ¨å­?
         for (int i = 0; i < StartPoint.Length; i++)
         {
             tempQueue.Enqueue(Nucleotide.Type.Empty);
@@ -383,7 +439,7 @@ public class NucleotideDirector : MonoBehaviour {
 
         // è½¬å½•åŒæ—¶æ£€æµ‹ç»ˆæ­¢å­ï¼Œé‡åˆ°ç»ˆæ­¢å­åœæ­¢è½¬å½•
 
-        // å½“å‰næ˜¯å¯åŠ¨å­åºåˆ—æœ€åä¸€ä¸ªï¼Œä¸éœ€è¦è½¬å½•
+        // å½“å‰næ˜¯å¯åŠ¨å­åºåˆ—æœ€åä¸€ä¸ªï¼Œä¸éœ€è¦è½¬å½?
         tempQueue.Clear();
         for (int i = 0; i < EndPoint.Length; i++)
         {
@@ -393,12 +449,12 @@ public class NucleotideDirector : MonoBehaviour {
         match = false;
         if (!n.next)
         {
-            Debug.Log("æ²¡æœ‰ä¸œè¥¿å¯ä»¥è½¬å½•ï¼");
+            Debug.Log("æ²¡æœ‰ä¸œè¥¿å¯ä»¥è½¬å½•ï¼?");
             animating = false;
             yield break;
         }
 
-        // è½¬å½•ç¬¬ä¸€ä¸ªåºåˆ—
+        // è½¬å½•ç¬¬ä¸€ä¸ªåºåˆ?
         n = n.next;
         Nucleotide curRNA = (Instantiate(rnaPrefab) as GameObject).GetComponent<Nucleotide>();
         curRNA.setType(getPairType(n.getLeftType(), true)); // ä½¿ç”¨isRNAæ¨¡å¼ï¼ŒAå¯¹åº”U
@@ -406,7 +462,7 @@ public class NucleotideDirector : MonoBehaviour {
         curRNA.transform.rotation = n.transform.rotation;
         yield return new WaitForSeconds(1);
 
-        // ç»ˆæ­¢å­é•¿åº¦è‚¯å®šå¤§äº1ï¼Œè¿™é‡Œå°±ä¸æ£€æµ‹äº†
+        // ç»ˆæ­¢å­é•¿åº¦è‚¯å®šå¤§äº?ï¼Œè¿™é‡Œå°±ä¸æ£€æµ‹äº†
         tempQueue.Dequeue();
         tempQueue.Enqueue(n.getLeftType());
 
@@ -591,5 +647,12 @@ public class NucleotideDirector : MonoBehaviour {
     		default:
     			return '-';
     	}
+    }
+
+    public static string reverseString(string s)
+    {
+        char[] charArray = s.ToCharArray();
+        Array.Reverse(charArray);
+        return new string(charArray);
     }
 }

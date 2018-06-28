@@ -27,12 +27,6 @@ public class EndpointTrigger : MonoBehaviour {
 					attached = true;
 			}
 		}
-		else if (other.tag == "cut") {//判断parent上下的核苷酸类型再cutPrev
-			if (attached) {
-                attached = false;
-                parent.cutPrev();
-            }
-        }
 	}
 
     
