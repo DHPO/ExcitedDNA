@@ -12,6 +12,7 @@ TagManager:
   - projectile
   - TeleportIgnore
   - Zip
+  - NucleotideCouplePart
   layers:
   - Default
   - TransparentFX

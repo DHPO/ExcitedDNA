@@ -27,6 +27,14 @@ public class EndpointTrigger : MonoBehaviour {
 					attached = true;
 			}
 		}
+        else if (other.tag == "cut")
+        {
+            if (attached)
+            {
+                attached = false;
+                parent.cutPrev();
+            }
+        }
 	}
 
     
