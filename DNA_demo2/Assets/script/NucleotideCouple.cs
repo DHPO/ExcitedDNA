@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using VRTK;
-
+using System;
 public class NucleotideCouple : MonoBehaviour
 {
 
@@ -93,6 +93,162 @@ public class NucleotideCouple : MonoBehaviour
         }
 
         setBondAngle(helixRatio);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+
+        if (other.tag == "cut")
+        {
+            Cutter cutter = GameObject.Find("Knife").GetComponent<Cutter>();
+            NucleotideDirector n = NucleotideDirector.getInstance();//GameObject.Find("NucleotideDirector").GetComponent<NucleotideDirector>();           
+            string before = cutter.seqBeforeCutPoint.ToUpper();
+            string after = cutter.seqAfterCutPoint.ToUpper();
+            
+            int forward = validateCutPoint(before, after);
+            int backward = validateCutPoint(after, before);
+            if(forward + backward > 0)
+            {
+                
+                if(backward > 0)
+                {
+                    string tmp = before;
+                    before = after;
+                    after = tmp;
+                }//对换两侧识别序列
+                NucleotideCouple top = up(before.Length),bottom = down(after.Length);
+
+
+
+                NucleotideCouple fromTop = n.buildCoupleChainFromOneDirection(top, 0);
+                NucleotideCouple fromBottom = n.buildCoupleChainFromOneDirection(bottom, 1);
+                NucleotideCouple downer = fromBottom, upper = fromTop  ;//用来遍历
+                //destroy original couple chain
+                n.destroyCoupleChain(n.getHeadOfCoupleChain(this));
+
+                int min_len = Math.Min(before.Length, after.Length);
+                int max_len = Math.Max(before.Length, after.Length);
+
+
+                for (int i = 0; i < max_len; i++)
+                {
+                    if (i < min_len)
+                    {
+                        upper.gameObject.SetActive(false);
+                        upper = upper.next;
+
+                        downer.gameObject.SetActive(false);
+                        downer = downer.prev;
+                    }
+                    else
+                    {
+                        upper.hideHydrogenBond();
+                        downer.hideHydrogenBond();
+                        if (backward + forward == 2)//左侧链配对成功
+                        {
+                            Debug.Log("list 1");
+                            upper.nucleotide1.gameObject.SetActive(false);
+                            downer.nucleotide2.gameObject.SetActive(false);
+                        }
+                        else if (backward + forward == 1)//右侧链配对成功
+                        {
+                            upper.nucleotide2.gameObject.SetActive(false);
+                            downer.nucleotide1.gameObject.SetActive(false);
+                            Debug.Log("list 2");
+                        }
+                        upper = upper.next;
+                        downer = downer.prev;
+                    }
+                }
+
+                fromTop.transform.position += new Vector3(0, -3, 0);
+                fromBottom.transform.position += new Vector3(0, 3, 0);
+                fromBottom.broadcastUpdateTransform();
+                fromTop.broadcastUpdateTransform();
+
+            }
+            else
+            {
+                //Debug.Log("no match");
+            }
+        }
+    }
+
+   
+
+    public NucleotideCouple down(int n)
+    {
+        int count = 0;
+        NucleotideCouple nex = next;
+        while (nex.next && count < n - 1)
+        {
+            
+            nex = nex.next;
+            count++;
+        }
+        return nex;//ignore count < n situation
+    }
+    public NucleotideCouple up(int n)
+    {
+        int count = 0;
+        NucleotideCouple pre = prev;
+        while (pre.prev && count < n)
+        {
+            Debug.Log("up");
+            pre = pre.prev;
+            count++;
+        }
+        return pre;//ignore count < n situation, assume no error like this will happen
+
+    }
+
+    public int validateCutPoint(string before, string after)
+    {
+        NucleotideDirector n = NucleotideDirector.getInstance();
+        bool res1 = true, res2 = true;
+        NucleotideCouple tmp = prev;
+
+        for (int i = before.Length - 1; i >= 0; i--)
+        {
+            if (tmp != null && n.Char2Type(before[i]) == tmp.nucleotide1.type) tmp = tmp.prev;
+            else  res1 = false; 
+        }
+ 
+        tmp = next;
+        if (nucleotide1.type == n.Char2Type(after[0]))
+        {
+            for (int i = 1; i < after.Length; i++)
+            {
+                if (tmp != null && n.Char2Type(after[i]) == tmp.nucleotide1.type) tmp = tmp.next;
+                else res1 = false;
+            }
+        }
+        else
+            res1 = false;
+        
+        //前半部分判断一侧是否可割，后半部分判断另一侧
+        tmp = prev;
+        for (int i = before.Length - 1; i >= 0; i--)
+        {
+            if (tmp != null && n.Char2Type(before[i]) == tmp.nucleotide2.type) tmp = tmp.prev;
+            else res2 = false;
+        }
+
+        tmp = next;
+        if (nucleotide2.type == n.Char2Type(after[0]))
+        {
+            for (int i = 1; i < after.Length; i++)
+            {
+                if (tmp != null && n.Char2Type(after[i]) == tmp.nucleotide2.type) tmp = tmp.next;
+                else res2 = false;
+            }
+        }
+        else
+            res2 = false;
+
+        if (res1) return 1;//nucleotide 1 match
+        else if (res2) return 2;//nucleotide 2 match
+        else return 0;
     }
 
     void setBondAngle(float helixRatio) {
@@ -191,21 +347,7 @@ public class NucleotideCouple : MonoBehaviour
         HydrogenBond3.SetActive(false);
     }
 
-    public void deHelix()
-    {
-        NucleotideCouple pre = prev;
-        NucleotideCouple nex = next;
-        while (pre != null)
-        {
-            pre.needHelix = false;
-            pre = pre.prev;
-        }
-        while(nex != null)
-        {
-            nex.needHelix = false;
-            nex = nex.next;
-        }
-    }
+
 
     public Nucleotide.Type getLeftType() {
         return nucleotide1.type;

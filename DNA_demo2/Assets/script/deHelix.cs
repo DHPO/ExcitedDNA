@@ -8,7 +8,8 @@ public class deHelix : MonoBehaviour {
     {
         if (other.tag == "NucleotideCouple")
         {
-           other.gameObject.GetComponent<NucleotideCouple>().deHelix();
+            //other.gameObject.GetComponent<NucleotideCouple>().deHelix();
+            NucleotideDirector.getInstance().deHelixCoupleChain(other.gameObject.GetComponent<NucleotideCouple>());
             Debug.Log("dehelix");
         }
     }

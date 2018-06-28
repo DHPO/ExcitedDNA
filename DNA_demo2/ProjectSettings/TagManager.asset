@@ -8,6 +8,10 @@ TagManager:
   - cut
   - NucleotideCouple
   - NucleotideRNA
+  - FxTemporaire
+  - projectile
+  - TeleportIgnore
+  - Zip
   layers:
   - Default
   - TransparentFX
